@@ -12,7 +12,7 @@
 <title>PropImmo — Proposition Locative</title>
 
 <!-- PWA Manifest -->
-<link rel="manifest" href="manifest.json">
+<link rel="manifest" href="pwa_manifest.json">
 
 <!-- Icônes Apple -->
 <link rel="apple-touch-icon" href="icon-192.png">
@@ -24,7 +24,7 @@
 <script>
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/service-worker.js')
+      navigator.serviceWorker.register('/pwa_sw.js')
         .then(() => console.log('✅ Service Worker enregistré'))
         .catch(e => console.warn('SW erreur:', e));
     });
