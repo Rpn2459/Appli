@@ -65,6 +65,14 @@ body{font-family:Arial,sans-serif;background:#f0f4f8;font-size:14px;
   background:#fff}
 .field input:focus,.field textarea:focus{outline:none;border-color:#2196F3;
   box-shadow:0 0 0 3px rgba(33,150,243,.15)}
+
+/* Style pour les champs de l'agence bloqués */
+.field input[readonly] {
+  background: #f1f5f9 !important;
+  color: #64748b !important;
+  border-color: #e2e8f0 !important;
+  cursor: not-allowed !important;
+}
 .note{font-size:11px;color:#888;font-style:italic;margin-top:5px}
 
 /* ── BOUTONS FIXES EN BAS ── */
@@ -99,35 +107,35 @@ body{font-family:Arial,sans-serif;background:#f0f4f8;font-size:14px;
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
 /* =========================================
-   DOCUMENT A4 STRUCTURÉ SUR 1 PAGE UNIQUE (794×1123px)
+   DOCUMENT A4 STRUCTURÉ SUR 1 PAGE COMPACTE UNIQUE (794×1123px)
    ========================================= */
 .doc{background:#fff;width:794px;margin:0 auto;
   box-shadow:0 2px 20px rgba(0,0,0,.18);
-  font-family:Arial,sans-serif;font-size:10px;line-height:1.35;color:#222}
-.page{width:794px;height:1123px;overflow:hidden;display:flex;
+  font-family:Arial,sans-serif;font-size:10px;line-height:1.3;color:#222}
+.page{width:794px;height:1123px;max-height:1123px;overflow:hidden;display:flex;
   flex-direction:column;position:relative;background:#fff;box-sizing:border-box;}
 
-.dh{background:#1a2a4a;color:#fff;padding:14px 20px;display:flex;
+.dh{background:#1a2a4a;color:#fff;padding:12px 20px;display:flex;
   justify-content:space-between;align-items:center;gap:10px;flex-shrink:0}
-.dh h1{font-size:16px;line-height:1.2;font-weight:900;text-transform:uppercase;flex:1}
+.dh h1{font-size:15px;line-height:1.2;font-weight:900;text-transform:uppercase;flex:1}
 .dh h1 .c{color:#2196F3}
 .dh-logo{text-align:right;flex-shrink:0}
-.dh-logo .lt{font-size:18px;font-weight:900;line-height:1}
-.dh-logo .lb{font-size:18px;font-weight:900;color:#2196F3;line-height:1}
+.dh-logo .lt{font-size:17px;font-weight:900;line-height:1}
+.dh-logo .lb{font-size:17px;font-weight:900;color:#2196F3;line-height:1}
 .dh-logo .lc{font-size:8px;color:#aac;margin-top:2px}
 
 .abar{background:#eef5ff;border:1.5px solid #c5dff8;text-align:center;
-  padding:6px 14px;color:#1a2a4a;font-weight:bold;font-size:10.5px;
-  margin:0 20px 8px;border-radius:0 0 5px 5px;flex-shrink:0}
+  padding:5px 14px;color:#1a2a4a;font-weight:bold;font-size:10px;
+  margin:0 20px 6px;border-radius:0 0 5px 5px;flex-shrink:0}
 
 .st{display:flex;align-items:center;gap:6px;background:#2196F3;color:#fff;
-  font-size:10px;font-weight:bold;padding:5px 10px;border-radius:4px;
-  margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px;flex-shrink:0}
+  font-size:9.5px;font-weight:bold;padding:4px 8px;border-radius:4px;
+  margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px;flex-shrink:0}
 
-.ds{margin:0 20px 6px;flex-shrink:0}
+.ds{margin:0 20px 5px;flex-shrink:0}
 
 table{width:100%;border-collapse:collapse;font-size:9.5px}
-th{background:#1a2a4a;color:#fff;padding:5px 6px;text-align:left;
+th{background:#1a2a4a;color:#fff;padding:4px 6px;text-align:left;
   font-size:9px;text-transform:uppercase;letter-spacing:.3px;font-weight:bold}
 td{padding:4px 6px;border-bottom:1px solid #eee;vertical-align:middle}
 tr:last-child td{border-bottom:none}
@@ -137,38 +145,37 @@ tr:last-child td{border-bottom:none}
 .hlr .amt{color:#7ecfff}
 .offered{color:#27ae60;font-weight:bold;font-size:9px}
 
-/* Grilles ajustées pour la mise en page condensée */
-.two{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:0 20px 6px;flex-shrink:0}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:0 20px 5px;flex-shrink:0}
 .two>.col{min-width:0}
 
 .ib{background:#f0f6ff;border-left:3px solid #2196F3;padding:4px 8px;
-  border-radius:0 4px 4px 0;margin-bottom:4px;font-size:9.5px;color:#333;line-height:1.4}
+  border-radius:0 4px 4px 0;margin-bottom:4px;font-size:9.5px;color:#333;line-height:1.3}
 
 .promo{background:linear-gradient(130deg,#1a2a4a 55%,#1e3560);color:#fff;
-  padding:8px 16px;margin:0 20px 6px;border-radius:6px;
+  padding:6px 14px;margin:0 20px 5px;border-radius:6px;
   display:flex;align-items:center;gap:12px;flex-shrink:0}
-.promo-ico{font-size:22px;flex-shrink:0}
-.promo .pm{font-size:12px;font-weight:bold}
-.promo .ps{font-size:9px;color:#aac}
+.promo-ico{font-size:20px;flex-shrink:0}
+.promo .pm{font-size:11.5px;font-weight:bold}
+.promo .ps{font-size:8.5px;color:#aac}
 
-.gg{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:6px}
-.gc{background:#eef5ff;border:1.5px solid #c5dff8;border-radius:4px;padding:6px 4px;text-align:center}
-.gc .gi{font-size:14px;margin-bottom:2px}
-.gc .gl{font-size:8px;color:#666;text-transform:uppercase;letter-spacing:.3px}
-.gc .ga{font-size:11px;font-weight:bold;color:#1a2a4a;margin:1px 0}
-.gc .gs{font-size:8px;color:#888}
+.gg{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:4px}
+.gc{background:#eef5ff;border:1.5px solid #c5dff8;border-radius:4px;padding:4px 2px;text-align:center}
+.gc .gi{font-size:12px;margin-bottom:1px}
+.gc .gl{font-size:8px;color:#666;text-transform:uppercase;letter-spacing:.2px}
+.gc .ga{font-size:10.5px;font-weight:bold;color:#1a2a4a;margin:1px 0}
+.gc .gs{font-size:7.5px;color:#888}
 
 .svc2{display:grid;grid-template-columns:1fr 1fr;gap:0 8px}
 .svcs{list-style:none}
-.svcs li{padding:3px 0;border-bottom:1px solid #f0f4ff;font-size:9px;
-  color:#333;display:flex;gap:4px;line-height:1.3}
-.svcs li .ico{width:14px;text-align:center;flex-shrink:0;font-size:10px}
+.svcs li{padding:2px 0;border-bottom:1px solid #f0f4ff;font-size:8.5px;
+  color:#333;display:flex;gap:4px;line-height:1.25}
+.svcs li .ico{width:12px;text-align:center;flex-shrink:0;font-size:9px}
 
-.chip{display:inline-block;background:#e8f4fd;color:#1565c0;font-size:8.5px;
-  font-weight:bold;padding:0px 5px;border-radius:6px;border:1px solid #b3d9f7}
+.chip{display:inline-block;background:#e8f4fd;color:#1565c0;font-size:8px;
+  font-weight:bold;padding:0px 4px;border-radius:5px;border:1px solid #b3d9f7}
 
 .df{background:#1a2a4a;color:#7a8faa;font-size:7.5px;text-align:center;
-  padding:6px 12px;line-height:1.5;margin-top:auto;flex-shrink:0}
+  padding:5px 12px;line-height:1.4;margin-top:auto;flex-shrink:0}
 .spacer{flex:1 1 auto}
 
 /* PRINT */
@@ -179,7 +186,7 @@ tr:last-child td{border-bottom:none}
   .tab-content{display:block!important}
   .doc-scroll{overflow:visible;background:#fff}
   .doc{overflow:visible;box-shadow:none;width:210mm;margin:0 auto}
-  .page{width:210mm;height:297mm;overflow:hidden;margin:0}
+  .page{width:210mm;height:297mm;max-height:297mm;overflow:hidden;margin:0}
   @page{size:A4 portrait;margin:0}
 }
 </style>
@@ -197,14 +204,14 @@ tr:last-child td{border-bottom:none}
 <div class="editor">
   <h2>📝 Personnalisation</h2>
 
-  <div class="esec"><h3>🏢 Agence</h3>
+  <div class="esec"><h3>🏢 Agence (Verrouillé)</h3>
     <div class="grid">
-      <div class="field"><label>Nom (ligne 1)</label><input id="a1" value="GUY"></div>
-      <div class="field"><label>Nom (ligne 2)</label><input id="a2" value="HOQUET"></div>
-      <div class="field"><label>Ville</label><input id="ac" value="SAINT-OMER"></div>
-      <div class="field"><label>Adresse agence</label><input id="aa" value="8 rue de l'Ecusserie 62500 Saint-Omer"></div>
-      <div class="field"><label>N° RCS</label><input id="ar" value="905000402"></div>
-      <div class="field"><label>Capital (€)</label><input id="ap" value="12 000"></div>
+      <div class="field"><label>Nom (ligne 1)</label><input id="a1" value="GUY" readonly></div>
+      <div class="field"><label>Nom (ligne 2)</label><input id="a2" value="HOQUET" readonly></div>
+      <div class="field"><label>Ville</label><input id="ac" value="SAINT-OMER" readonly></div>
+      <div class="field"><label>Adresse agence</label><input id="aa" value="8 rue de l'Ecusserie 62500 Saint-Omer" readonly></div>
+      <div class="field"><label>N° RCS</label><input id="ar" value="905000402" readonly></div>
+      <div class="field"><label>Capital (€)</label><input id="ap" value="12 000" readonly></div>
     </div>
   </div>
 
@@ -360,7 +367,7 @@ function getHTMLContent(){
         <div class="gg">
           <div class="gc"><div class="gi">🏦</div><div class="gl">Impayés</div><div class="ga">${v('glL')} €</div><div class="gs">Max</div></div>
           <div class="gc"><div class="gi">🔧</div><div class="gl">Dégrad.</div><div class="ga">${v('glD')} €</div><div class="gs">Max</div></div>
-          <div class="gc"><div class="gi">⚖️</div><div class="gl">Juridique</div><div class="ga">${v('glJ')} €</div><div class="gs">Seuil ${v('glS')}€</div></div>
+          <div class="gc"><div class="gi">⚖️</div><div class="gl">Protection juridique</div><div class="ga">${v('glJ')} €</div><div class="gs">Seuil ${v('glS')}€</div></div>
         </div>
         <table class="zb" style="margin-bottom:4px">
           <thead><tr><th>Bail</th><th>Gestion + GLI</th><th>Net Final Sécurisé</th></tr></thead>
@@ -377,14 +384,14 @@ function getHTMLContent(){
           <ul class="svcs">
             <li><span class="ico">👤</span>Interlocuteur unique direct</li>
             <li><span class="ico">💻</span>Espace extranet 24h/24</li>
-            <li><span class="ico">📨</span>Quittances et avis de skipper</li>
+            <li><span class="ico">📨</span>Quittances et avis mensuels</li>
             <li><span class="ico">💳</span>Reversement des loyers le 20</li>
             <li><span class="ico">🏢</span>Gestion des charges syndic</li>
             <li><span class="ico">🚨</span>Relances et suivi contentieux</li>
           </ul>
           <ul class="svcs">
-            <li><span class="ico">⛺</span>Gestion complète des dossiers CAF</li>
-            <li><span class="ico">📋</span>Vérification annuelle assurances</li>
+            <li><span class="ico">⛺</span>Gestion complète dossiers CAF</li>
+            <li><span class="ico">📋</span>Vérification baux & ass.</li>
             <li><span class="ico">📊</span>Rapport d'aide fiscale annuel</li>
             <li><span class="ico">🔄</span>Régularisation des charges</li>
             <li><span class="ico">📈</span>Révision IRL automatique</li>
@@ -409,7 +416,7 @@ function render(){
   if(out) out.innerHTML = getHTMLContent();
 }
 
-/* RENDU STRATEGIQUE 1 PAGE PAR IFRAME ABSOLUE ET ANTI-TEXT-AUTOSIZING */
+/* RENDU MAXIMUM SECURISE 1 PAGE COMPACTE PAR IFRAME SANS AUTO-SIZING */
 function pdfName(){return`Proposition_${v('pr')||'bien'}_${v('ac')}.pdf`.replace(/\s+/g,'_');}
 
 function generatePDFObject() {
@@ -423,7 +430,7 @@ function generatePDFObject() {
     iframe.style.top = '-20000px';
     iframe.style.left = '-20000px';
     iframe.style.width = '794px';
-    iframe.style.height = '1150px';
+    iframe.style.height = '1123px';
     iframe.style.border = 'none';
     document.body.appendChild(iframe);
 
@@ -434,7 +441,7 @@ function generatePDFObject() {
     iframeDoc.open();
     iframeDoc.write(`
       <!DOCTYPE html>
-      <html style="width:794px !important; min-width:794px !important;">
+      <html style="width:794px !important; min-width:794px !important; height:1123px !important; max-height:1123px !important;">
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=794, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -445,7 +452,9 @@ function generatePDFObject() {
             width: 794px !important; 
             min-width: 794px !important; 
             max-width: 794px !important; 
-            overflow: visible !important; 
+            height: 1123px !important;
+            max-height: 1123px !important;
+            overflow: hidden !important; 
             -webkit-text-size-adjust: none !important; 
             text-size-adjust: none !important;
           }
@@ -455,13 +464,15 @@ function generatePDFObject() {
             width: 794px !important; 
             min-width: 794px !important; 
             max-width: 794px !important; 
-            display: block !important;
             height: 1123px !important;
+            max-height: 1123px !important;
+            display: block !important;
+            overflow: hidden !important;
           }
           .two { 
             display: block !important; 
             width: 754px !important; 
-            margin: 0 20px 6px !important;
+            margin: 0 20px 5px !important;
           }
           .two .col { 
             float: left !important; 
@@ -478,8 +489,8 @@ function generatePDFObject() {
           }
         </style>
       </head>
-      <body style="width:794px !important;">
-        <div id="iframeDocOut" style="width:794px !important;">${docStr}</div>
+      <body style="width:794px !important; height:1123px !important; max-height:1123px !important;">
+        <div id="iframeDocOut" style="width:794px !important; height:1123px !important; max-height:1123px !important;">${docStr}</div>
       </body>
       </html>
     `);
@@ -489,7 +500,6 @@ function generatePDFObject() {
       try {
         const pages = iframeDoc.querySelectorAll('.page');
         const { jsPDF } = window.jspdf;
-        // Création du document PDF compressé avec 1 seule page forcée
         const pdf = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4', compress: true });
 
         const canvas = await window.html2canvas(pages[0], {
@@ -517,18 +527,18 @@ function generatePDFObject() {
 }
 
 async function doPDF(){
-  toast('⏳ Génération de la page PDF…');
+  toast('⏳ Génération du PDF 1 page…');
   try {
     const pdf = await generatePDFObject();
     pdf.save(pdfName());
-    toast('✅ PDF 1 page téléchargé !');
+    toast('✅ PDF 1 page unique téléchargé !');
   } catch(e) {
     console.error(e);
     toast('❌ Erreur lors de la création du PDF.');
   }
 }
 
-/* LOGIQUE DE PARTAGE DIRECT MULTI-PLATEFORME */
+/* LOGIQUE DE PARTAGE WEB SHARE NATIVE 1 PAGE */
 async function shareDocument() {
   toast('⏳ Préparation du partage…');
   try {
@@ -537,7 +547,7 @@ async function shareDocument() {
     const fileName = pdfName();
     
     const file = new File([pdfBlob], fileName, { type: 'application/pdf' });
-    const shareText = `Bonjour, veuillez trouver ci-joint notre proposition de gestion locative d'une page concernant le bien situé à : ${v('pa')}.`;
+    const shareText = `Bonjour, veuillez trouver ci-joint notre proposition commerciale de gestion locative concernant le bien situé à : ${v('pa')}.`;
 
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
       await navigator.share({
@@ -558,7 +568,7 @@ async function shareDocument() {
   }
 }
 
-/* TABS AVEC MISE À L'ÉCHELLE MOBILE VISUELLE (1 PAGE) */
+/* TABS AVEC MISE À L'ÉCHELLE MOBILE VISUELLE */
 function go(t){
   document.querySelectorAll('.tab').forEach((x,i)=>
     x.classList.toggle('active',(i===0&&t==='editor')||(i===1&&t==='preview')));
@@ -583,7 +593,7 @@ function go(t){
         const wrapper = document.createElement('div');
         wrapper.className = 'scale-container';
         wrapper.style.width = '794px';
-        wrapper.style.height = (1123 * scaleFactor) + 'px'; // Calcule la hauteur proportionnelle d'une seule page
+        wrapper.style.height = (1123 * scaleFactor) + 'px'; 
         wrapper.style.transform = `scale(${scaleFactor})`;
         
         doc.parentNode.insertBefore(wrapper, doc);
