@@ -132,11 +132,25 @@ body{font-family:Arial,sans-serif;background:#f0f4f8;font-size:14px;
   font-size:10.5px;font-weight:bold;padding:6px 12px;border-radius:4px;
   margin-bottom:10px;text-transform:uppercase;letter-spacing:.6px;flex-shrink:0}
 
+.st.orange{background:#e67e22}
+
 .ds{margin:0 24px 14px;flex-shrink:0}
 
-/* Bloc Interlocuteur sur le PDF */
-.c-info{background:#f8f9fa;border:1px solid #e2e8f0;border-radius:5px;padding:10px 14px;margin:0 24px 14px;font-size:10px;color:#333}
-.c-info strong{color:#1a2a4a}
+.c-footer-signature {
+  margin: 0 24px 14px;
+  padding: 12px 16px;
+  background: #f8fafc;
+  border-top: 2px solid #2196F3;
+  border-radius: 4px;
+  font-size: 11px;
+  color: #334155;
+  text-align: right;
+  flex-shrink: 0;
+}
+.c-footer-signature strong {
+  color: #1a2a4a;
+  font-size: 11.5px;
+}
 
 table{width:100%;border-collapse:collapse;font-size:10px}
 th{background:#1a2a4a;color:#fff;padding:6px 8px;text-align:left;
@@ -169,7 +183,6 @@ tr:last-child td{border-bottom:none}
 .gc .ga{font-size:12.5px;font-weight:bold;color:#1a2a4a;margin:2px 0}
 .gc .gs{font-size:8px;color:#888}
 
-.svc2{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
 .svc2{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
 .svcs{list-style:none}
 .svcs li{padding:4px 0;border-bottom:1px solid #f0f4ff;font-size:9.5px;
@@ -307,7 +320,6 @@ const v=id=>document.getElementById(id)?.value||'';
 const n=id=>parseFloat(v(id))||0;
 const f=x=>parseFloat(x).toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})+'\u00a0€';
 
-/* Gestion de la mémoire locale pour le mobile */
 function loadRep(){
   if(localStorage.getItem('propimmo_cNom')) document.getElementById('cNom').value = localStorage.getItem('propimmo_cNom');
   if(localStorage.getItem('propimmo_cPre')) document.getElementById('cPre').value = localStorage.getItem('propimmo_cPre');
@@ -321,7 +333,6 @@ function saveRep(){
   localStorage.setItem('propimmo_cE', document.getElementById('cE').value);
 }
 
-/* Toast */
 function toast(msg,ms=2800){
   const el=document.getElementById('toast');
   if(el){el.textContent=msg;el.classList.add('show');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('show'),ms);}
@@ -364,40 +375,38 @@ function getHTMLPage1(){
       </table>
     </div>
 
-    <div class="two">
-      <div class="col">
-        <div class="st"><span>📋</span> Honoraires Location</div>
-        <table class="zb" style="margin-bottom:8px">
-          <thead><tr><th>Prestation</th><th style="text-align:center">Loc.</th><th style="text-align:center">Bail.</th></tr></thead>
-          <tbody>
-            <tr><td>📢 Commercialisation</td><td></td><td style="text-align:center">✅</td></tr>
-            <tr><td>🔍 Étude dossiers</td><td></td><td style="text-align:center">✅</td></tr>
-            <tr><td>🚪 Visites</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td></tr>
-            <tr><td>📄 Dossier locataire</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td></tr>
-            <tr><td>✍️ Rédaction bail</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td></tr>
-            <tr><td>🏡 État des lieux</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td></tr>
-            <tr><td>🤝 Entremise / négo.</td><td></td><td class="offered" style="text-align:center">🎁 Offert</td></tr>
-          </tbody>
-        </table>
-        <p style="font-size:9px;color:#555;margin-bottom:6px"><strong>Barème :</strong> ${fM} €/m² + ${fE} €/m² EDL</p>
-        <table style="width:100%">
-          <thead><tr><th>Surface</th><th>Mission</th><th>EDL</th><th>Total</th></tr></thead>
-          <tbody><tr class="hlr"><td>${surf} m²</td><td class="amt">${f(surf*fM)}</td><td class="amt">${f(surf*fE)}</td><td class="amt">${f(n('fT'))}</td></tr></tbody>
-        </table>
-      </div>
-      <div class="col">
-        <div class="st"><span>⚙️</span> Honoraires Gestion</div>
-        <div class="ib">⚙️ <strong>${v('gR')}% TTC</strong> des loyers perçus</div>
-        <div class="ib">📦 <strong>${v('gM')}% TTC</strong> à partir de <strong>${v('gT')} lots</strong></div>
-        <p style="font-size:9.5px;color:#555;margin:7px 0 5px;font-weight:bold">Devis personnalisé :</p>
-        <table class="zb">
-          <thead><tr><th>Bail</th><th>Brut</th><th>Gestion</th><th>Net</th></tr></thead>
-          <tbody>
-            <tr><td>📄 Nue</td><td>${f(rN)}</td><td>${c.mN}</td><td class="amt">${c.nN}</td></tr>
-            <tr><td>🛋️ Meublée</td><td>${f(rM)}</td><td>${c.mM}</td><td class="amt">${c.nM}</td></tr>
-          </tbody>
-        </table>
-      </div>
+    <div class="ds">
+      <div class="st"><span>📋</span> Honoraires Location & Mise en place</div>
+      <table class="zb" style="margin-bottom:8px">
+        <thead><tr><th>Prestation de recherche & constitution du dossier</th><th style="text-align:center">Locataire</th><th style="text-align:center">Bailleur</th></tr></thead>
+        <tbody>
+          <tr><td>📢 Commercialisation complète, publicité & communication</td><td></td><td style="text-align:center">✅</td></tr>
+          <tr><td>🔍 Sélection rigoureuse & étude de solvabilité des dossiers</td><td></td><td style="text-align:center">✅</td></tr>
+          <tr><td>🚪 Organisation des visites du bien</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td></tr>
+          <tr><td>✍️ Rédaction du bail sécurisé & constitution des annexes</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td></tr>
+          <tr><td>🏡 Réalisation de l'état des lieux d'entrée (EDL)</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td></tr>
+          <tr><td>🤝 Frais d'entremise et de négociation commerciale</td><td></td><td class="offered" style="text-align:center">🎁 Offert</td></tr>
+        </tbody>
+      </table>
+      <table style="width:100%">
+        <thead><tr><th>Surface habitable</th><th>Calcul Mission (${fM}€/m²)</th><th>Calcul EDL (${fE}€/m²)</th><th>Total Unique Facturé</th></tr></thead>
+        <tbody><tr class="hlr"><td>${surf} m²</td><td class="amt">${f(surf*fM)}</td><td class="amt">${f(surf*fE)}</td><td class="amt">${f(n('fT'))}</td></tr></tbody>
+      </table>
+    </div>
+
+    <div class="ds">
+      <div class="st"><span>⚙️</span> Honoraires de Gestion Courante</div>
+      <div class="ib" style="margin-bottom:8px">⚙️ <strong>Formule Standard :</strong> Un taux fixe de <strong>${v('gR')}% TTC</strong> appliqué sur l'ensemble des montants encaissés.</div>
+      <div class="ib" style="margin-bottom:8px">📦 <strong>Avantage Multi-lots :</strong> Un taux réduit à <strong>${v('gM')}% TTC</strong> accessible dès un portefeuille de <strong>${v('gT')} lots</strong>.</div>
+      
+      <p style="font-size:9.5px;color:#555;margin:8px 0 5px;font-weight:bold">Simulations de vos revenus nets mensuels (hors options) :</p>
+      <table class="zb">
+        <thead><tr><th>Type de Bail préconisé</th><th>Loyer Brut HC</th><th>Honoraires de gestion mensuels</th><th>Revenu Net reversé</th></tr></thead>
+        <tbody>
+          <tr><td>📄 Gestion Location Nue</td><td>${f(rN)}</td><td>${c.mN}</td><td class="amt">${c.nN}</td></tr>
+          <tr><td>🛋️ Gestion Location Meublée</td><td>${f(rM)}</td><td>${c.mM}</td><td class="amt">${c.nM}</td></tr>
+        </tbody>
+      </table>
     </div>
 
     <div class="promo">
@@ -418,13 +427,8 @@ function getHTMLPage2(){
   return `
   <div class="page">
     <div class="p2h"><strong>${v('a1')} ${v('a2')} ${v('ac')}</strong><span>📍 ${v('pa')}</span></div>
-    
-    ${hasRep ? `
-    <div class="c-info">
-      Votre conseiller dédié : <strong>${fullName || '—'}</strong> ${v('cT') ? ' · 📞 ' + v('cT') : ''} ${v('cE') ? ' · ✉️ ' + v('cE') : ''}
-    </div>` : ''}
 
-    <div class="ds" style="margin-top:2px">
+    <div class="ds" style="margin-top:6px">
       <div class="st"><span>🛡️</span> Assurances & Protections</div>
       <p style="font-size:10px;color:#555;margin-bottom:9px"><strong>Option GLI :</strong> <span class="chip">${v('gi')}% TTC</span> des loyers perçus</p>
       <div class="gg">
@@ -443,32 +447,44 @@ function getHTMLPage2(){
     </div>
 
     <div class="ds">
-      <div class="st"><span>✅</span> Services de Gestion</div>
+      <div class="st"><span>✅</span> Services Garantis de Gestion</div>
       <div class="svc2">
         <ul class="svcs">
-          <li><span class="ico">👤</span>INCLUS</li>
+          <li><span class="ico">👤</span>Interlocuteur unique location & gestion</li>
           <li><span class="ico">💻</span>Espace client : baux, EDL, comptabilité</li>
           <li><span class="ico">📨</span>Quittances mensuelles aux locataires</li>
           <li><span class="ico">💳</span>Loyers reversés le 20 de chaque mois</li>
-          <li><span class="ico">🏢</span>Révision annuelle des loyers</li>
-          <li><span class="ico">🚨</span>Relance impayés : tél., courrier, échéancier</li>
-          <li><span class="ico">📋</span>Attestations assurances & chaudière / an</li>
-          <li><span class="ico">🔄</span>Régularisation annuelle des charges</li>
         </ul>
         <ul class="svcs">
-          <li><span class="ico">👤</span>OPTIONNELS</li>
-          <li><span class="ico">📋</span>Paiement des charges de copro</li>
-          <li><span class="ico">📊</span>Aide déclaration fiscale 2044</li>
-          <li><span class="ico">🔄</span>Recouvrement des créances avec huissier</li>
-          <li><span class="ico">📈</span>Régulatisation des charges copro</li>
-          <li><span class="ico">🔨</span>Gestion Technique des travaux</li>
-          <li><span class="ico">📋</span>Avenant au bail</li>
-          <li><span class="ico">👤</span>Représentation des propriétaires aux conciliations de justice</li>
+          <li><span class="ico">⛺</span>Saisie CAF pour locataires APL</li>
+          <li><span class="ico">📋</span>Attestations assurances & chaudière / an</li>
+          <li><span class="ico">📈</span>Révision annuelle des loyers (IRL)</li>
+          <li><span class="ico">🔨</span>Travaux urgents &lt; 175 € gérés directement</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="ds">
+      <div class="st orange"><span>🛠️</span> Services Optionnels</div>
+      <div class="svc2">
+        <ul class="svcs">
+          <li><span class="ico">📊</span>Aide complète à la déclaration fiscale (Formulaire 2044)</li>
+          <li><span class="ico">🏢</span>Gestion complète des charges de copropriété & syndic</li>
+        </ul>
+        <ul class="svcs">
+          <li><span class="ico">🚨</span>Recouvrement des créances avec suivi et action d'huissier</li>
+          <li><span class="ico">🔄</span>Régularisation annuelle approfondie des charges locatives</li>
         </ul>
       </div>
     </div>
 
     <div class="spacer"></div>
+
+    ${hasRep ? `
+    <div class="c-footer-signature">
+      Votre conseiller commercial dédié : <strong>${fullName || '—'}</strong> ${v('cT') ? ' · 📞 ' + v('cT') : ''} ${v('cE') ? ' · ✉️ ' + v('cE') : ''}
+    </div>` : ''}
+
     <div class="df">${v('a1')} ${v('a2')} ${v('ac')} — agence juridiquement et financièrement indépendante. SAS au capital de ${v('ap')} € — RCS n° ${v('ar')} — ${v('aa')}.</div>
   </div>`;
 }
@@ -482,7 +498,7 @@ function render(){
   if(out) out.innerHTML = getHTMLContent();
 }
 
-/* RENDU UNITAIRE SANS DECALAGE MOBILES */
+/* GENERATION PAR UNIQUE PAGE SANS AUCUN COMPORTEMENT FLOTTANT */
 function pdfName(){return`Proposition_${v('pr')||'bien'}_${v('ac')}.pdf`.replace(/\s+/g,'_');}
 
 function generatePDFPageObject(htmlMarkup) {
@@ -531,23 +547,15 @@ function generatePDFPageObject(htmlMarkup) {
             flex-direction: column !important;
             overflow: hidden !important;
           }
-          .two { 
-            display: block !important; 
-            width: 746px !important; 
-            margin: 0 24px 14px !important;
-          }
-          .two .col { 
-            float: left !important; 
-            width: 365px !important; 
-          }
-          .two .col:last-child { 
-            float: right !important; 
-            width: 365px !important; 
-          }
-          .page::after, .two::after {
-            content: "";
+          .svc2 {
             display: table !important;
-            clear: both !important;
+            width: 100% !important;
+            table-layout: fixed !important;
+          }
+          .svc2 .svcs {
+            display: table-cell !important;
+            width: 50% !important;
+            vertical-align: top !important;
           }
         </style>
       </head>
@@ -633,7 +641,7 @@ async function shareDocument() {
       });
       toast('✅ Document partagé !');
     } else {
-      const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText + " (Le document PDF a été enregistré simultanément dans vos téléchargements)")}`;
+      const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText + " (Le document PDF a été enregistré préliminairement dans vos téléchargements)")}`;
       pdfObject.save(fileName);
       window.open(waUrl, '_blank');
       toast('💾 PDF enregistré & Partage ouvert !');
@@ -679,7 +687,6 @@ function go(t){
   }
 }
 
-// Chargement initial des informations du conseiller
 loadRep();
 autoFee();
 render();
