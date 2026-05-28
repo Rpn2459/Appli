@@ -8,24 +8,25 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="PropImmo">
-<meta name="description" content="Créez et envoyez des propositions de gestion locative en PDF">
-<title>PropImmo — Proposition Locative</title>
+<meta name="description" content="CrÃ©ez et envoyez des propositions de gestion locative en PDF">
+<title>PropImmo â Proposition Locative</title>
 
 <!-- PWA Manifest -->
 <link rel="manifest" href="pwa_manifest.json">
 
-<!-- Icônes Apple -->
+<!-- IcÃ´nes Apple -->
 <link rel="apple-touch-icon" href="icon-192.png">
 
 <!-- html2pdf -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
 <!-- Service Worker -->
 <script>
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('/pwa_sw.js')
-        .then(() => console.log('✅ Service Worker enregistré'))
+        .then(() => console.log('â Service Worker enregistrÃ©'))
         .catch(e => console.warn('SW erreur:', e));
     });
   }
@@ -35,14 +36,14 @@
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;overflow-x:hidden}
 body{font-family:Arial,sans-serif;background:#f0f4f8;font-size:14px;
-  /* évite le bounce iOS */
+  /* Ã©vite le bounce iOS */
   overscroll-behavior:none;
-  /* safe area pour les téléphones avec encoche */
+  /* safe area pour les tÃ©lÃ©phones avec encoche */
   padding-top:env(safe-area-inset-top);
   padding-bottom:env(safe-area-inset-bottom);
 }
 
-/* ── TABS ── */
+/* ââ TABS ââ */
 .tabs{display:flex;background:#1a2a4a;position:sticky;top:0;z-index:100;
   padding-top:env(safe-area-inset-top)}
 .tab{flex:1;padding:14px 8px;color:#aac;cursor:pointer;font-size:13px;
@@ -51,7 +52,7 @@ body{font-family:Arial,sans-serif;background:#f0f4f8;font-size:14px;
 .tab.active{color:#fff;border-bottom-color:#2196F3;font-weight:bold}
 .tab-content{display:none}.tab-content.active{display:block}
 
-/* ── EDITOR ── */
+/* ââ EDITOR ââ */
 .editor{padding:16px;max-width:700px;margin:0 auto;
   padding-bottom:calc(80px + env(safe-area-inset-bottom))}
 .editor h2{color:#1a2a4a;margin-bottom:14px;font-size:16px}
@@ -73,7 +74,7 @@ body{font-family:Arial,sans-serif;background:#f0f4f8;font-size:14px;
   box-shadow:0 0 0 3px rgba(33,150,243,.15)}
 .note{font-size:11px;color:#888;font-style:italic;margin-top:5px}
 
-/* ── BOUTONS FIXES EN BAS (mobile) ── */
+/* ââ BOUTONS FIXES EN BAS (mobile) ââ */
 .acts-fixed{position:fixed;bottom:0;left:0;right:0;
   background:#fff;border-top:1px solid #e0e0e0;
   padding:10px 16px calc(10px + env(safe-area-inset-bottom));
@@ -88,13 +89,13 @@ body{font-family:Arial,sans-serif;background:#f0f4f8;font-size:14px;
 .btn.out{background:#fff;color:#2196F3;border:2px solid #2196F3}
 .btn.gray{background:#607d8b;color:#fff}
 
-/* ── PREVIEW ── */
+/* ââ PREVIEW ââ */
 .preview-wrap{background:#cdd4db;padding:12px;
   padding-bottom:calc(80px + env(safe-area-inset-bottom))}
 .preview-acts{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
 .doc-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:4px}
 
-/* ── TOAST NOTIFICATION ── */
+/* ââ TOAST NOTIFICATION ââ */
 .toast{position:fixed;bottom:calc(80px + env(safe-area-inset-bottom) + 12px);
   left:50%;transform:translateX(-50%) translateY(20px);
   background:#323232;color:#fff;padding:10px 20px;border-radius:24px;
@@ -102,7 +103,7 @@ body{font-family:Arial,sans-serif;background:#f0f4f8;font-size:14px;
   pointer-events:none}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
-/* ── MODAL ── */
+/* ââ MODAL ââ */
 .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);
   z-index:999;align-items:flex-end;justify-content:center}
 .modal-bg.show{display:flex}
@@ -123,9 +124,9 @@ body{font-family:Arial,sans-serif;background:#f0f4f8;font-size:14px;
 #mailStatus.err{background:#fdedec;color:#c0392b;border:1px solid #f1948a}
 #mailStatus.info{background:#eaf4ff;color:#1976D2;border:1px solid #90caf9}
 
-/* ════════════════════════
-   DOCUMENT A4 794×1123px
-   ════════════════════════ */
+/* ââââââââââââââââââââââââ
+   DOCUMENT A4 794Ã1123px
+   ââââââââââââââââââââââââ */
 .doc{background:#fff;width:794px;margin:0 auto;
   box-shadow:0 2px 20px rgba(0,0,0,.18);
   font-family:Arial,sans-serif;font-size:10.5px;line-height:1.4;color:#222}
@@ -207,8 +208,9 @@ tr:last-child td{border-bottom:none}
   body{background:#fff;padding:0}
   .preview-wrap{padding:0;background:#fff}
   .tab-content{display:block!important}
-  .doc-scroll,.doc{overflow:visible;box-shadow:none;width:794px;max-width:794px}
-  .page{width:100%;min-height:297mm;overflow:visible}
+  .doc-scroll{overflow:visible;background:#fff}
+  .doc{overflow:visible;box-shadow:none;width:210mm;margin:0 auto}
+  .page{width:210mm;height:297mm;overflow:hidden;margin:0}
   .pb{page-break-after:always;break-after:page}
   @page{size:A4 portrait;margin:0}
 }
@@ -218,8 +220,8 @@ tr:last-child td{border-bottom:none}
 
 <!-- TABS -->
 <div class="tabs">
-  <div class="tab active" onclick="go('editor')">✏️ Personnaliser</div>
-  <div class="tab" onclick="go('preview')">👁️ Aperçu</div>
+  <div class="tab active" onclick="go('editor')">âï¸ Personnaliser</div>
+  <div class="tab" onclick="go('preview')">ðï¸ AperÃ§u</div>
 </div>
 
 <!-- TOAST -->
@@ -228,72 +230,72 @@ tr:last-child td{border-bottom:none}
 <!-- EDITOR -->
 <div id="editor" class="tab-content active">
 <div class="editor">
-  <h2>✏️ Personnalisation</h2>
+  <h2>âï¸ Personnalisation</h2>
 
-  <div class="esec"><h3>🏢 Agence</h3>
+  <div class="esec"><h3>ð¢ Agence</h3>
     <div class="grid">
       <div class="field"><label>Nom (ligne 1)</label><input id="a1" value="GUY"></div>
       <div class="field"><label>Nom (ligne 2)</label><input id="a2" value="HOQUET"></div>
       <div class="field"><label>Ville</label><input id="ac" value="SAINT-OMER"></div>
       <div class="field"><label>Adresse agence</label><input id="aa" value="8 rue de l'Ecusserie 62500 Saint-Omer"></div>
-      <div class="field"><label>N° RCS</label><input id="ar" value="905000402"></div>
-      <div class="field"><label>Capital (€)</label><input id="ap" value="12 000"></div>
+      <div class="field"><label>NÂ° RCS</label><input id="ar" value="905000402"></div>
+      <div class="field"><label>Capital (â¬)</label><input id="ap" value="12 000"></div>
     </div>
   </div>
 
-  <div class="esec"><h3>🏠 Bien</h3>
-    <div class="grid one"><div class="field"><label>Adresse complète</label><input id="pa" value="Appartement D2, 5 rue de l'Egalité 62510 ARQUES"></div></div>
+  <div class="esec"><h3>ð  Bien</h3>
+    <div class="grid one"><div class="field"><label>Adresse complÃ¨te</label><input id="pa" value="Appartement D2, 5 rue de l'EgalitÃ© 62510 ARQUES"></div></div>
     <div class="grid" style="margin-top:10px">
       <div class="field"><label>Type de bien</label><input id="pt" value="Appartement 1 chambre"></div>
-      <div class="field"><label>Superficie (m²)</label><input id="ps" value="47" type="number" inputmode="numeric" oninput="autoFee()"></div>
-      <div class="field"><label>Référence / Lot</label><input id="pr" value="D2"></div>
+      <div class="field"><label>Superficie (mÂ²)</label><input id="ps" value="47" type="number" inputmode="numeric" oninput="autoFee()"></div>
+      <div class="field"><label>RÃ©fÃ©rence / Lot</label><input id="pr" value="D2"></div>
     </div>
   </div>
 
-  <div class="esec"><h3>💰 Loyers</h3>
+  <div class="esec"><h3>ð° Loyers</h3>
     <div class="grid">
-      <div class="field"><label>Loyer nu HC (€)</label><input id="rN" value="630" type="number" inputmode="decimal"></div>
-      <div class="field"><label>Loyer meublé HC (€)</label><input id="rM" value="660" type="number" inputmode="decimal"></div>
-      <div class="field"><label>Charges locatives (€)</label><input id="rC" value="0" type="number" inputmode="decimal"></div>
+      <div class="field"><label>Loyer nu HC (â¬)</label><input id="rN" value="630" type="number" inputmode="decimal"></div>
+      <div class="field"><label>Loyer meublÃ© HC (â¬)</label><input id="rM" value="660" type="number" inputmode="decimal"></div>
+      <div class="field"><label>Charges locatives (â¬)</label><input id="rC" value="0" type="number" inputmode="decimal"></div>
     </div>
   </div>
 
-  <div class="esec"><h3>📋 Honoraires de location</h3>
+  <div class="esec"><h3>ð Honoraires de location</h3>
     <div class="grid">
-      <div class="field"><label>Mission complète (€/m²)</label><input id="fM" value="8" type="number" inputmode="decimal" oninput="autoFee()"></div>
-      <div class="field"><label>État des lieux (€/m²)</label><input id="fE" value="3" type="number" inputmode="decimal" oninput="autoFee()"></div>
-      <div class="field"><label>Total honoraires (€)</label><input id="fT" value="510" type="number" inputmode="decimal"></div>
+      <div class="field"><label>Mission complÃ¨te (â¬/mÂ²)</label><input id="fM" value="8" type="number" inputmode="decimal" oninput="autoFee()"></div>
+      <div class="field"><label>Ãtat des lieux (â¬/mÂ²)</label><input id="fE" value="3" type="number" inputmode="decimal" oninput="autoFee()"></div>
+      <div class="field"><label>Total honoraires (â¬)</label><input id="fT" value="510" type="number" inputmode="decimal"></div>
     </div>
-    <p class="note">Recalculé auto : (mission + EDL) × superficie</p>
+    <p class="note">RecalculÃ© auto : (mission + EDL) Ã superficie</p>
   </div>
 
-  <div class="esec"><h3>⚙️ Gestion & Assurances</h3>
+  <div class="esec"><h3>âï¸ Gestion & Assurances</h3>
     <div class="grid">
       <div class="field"><label>Taux gestion (%)</label><input id="gR" value="6" type="number" inputmode="decimal"></div>
       <div class="field"><label>Taux multi-lots (%)</label><input id="gM" value="5" type="number" inputmode="decimal"></div>
       <div class="field"><label>Seuil multi-lots (lots)</label><input id="gT" value="10" type="number" inputmode="numeric"></div>
       <div class="field"><label>Taux GLI (%)</label><input id="gi" value="2.75" type="number" inputmode="decimal" step="0.01"></div>
-      <div class="field"><label>Plafond loyers impayés (€)</label><input id="glL" value="90 000"></div>
-      <div class="field"><label>Plafond détériorations (€)</label><input id="glD" value="10 000"></div>
-      <div class="field"><label>Plafond protection juridique (€)</label><input id="glJ" value="6 000"></div>
-      <div class="field"><label>Seuil intervention (€)</label><input id="glS" value="250"></div>
-      <div class="field"><label>PNO standard (€/an)</label><input id="pno" value="93" type="number" inputmode="decimal"></div>
+      <div class="field"><label>Plafond loyers impayÃ©s (â¬)</label><input id="glL" value="90 000"></div>
+      <div class="field"><label>Plafond dÃ©tÃ©riorations (â¬)</label><input id="glD" value="10 000"></div>
+      <div class="field"><label>Plafond protection juridique (â¬)</label><input id="glJ" value="6 000"></div>
+      <div class="field"><label>Seuil intervention (â¬)</label><input id="glS" value="250"></div>
+      <div class="field"><label>PNO standard (â¬/an)</label><input id="pno" value="93" type="number" inputmode="decimal"></div>
     </div>
   </div>
 
-  <div class="esec"><h3>🎁 Offre promo</h3>
+  <div class="esec"><h3>ð Offre promo</h3>
     <div class="grid">
-      <div class="field"><label>Libellé</label><input id="pL" value="3 mois de gestion offerts"></div>
-      <div class="field"><label>Période</label><input id="pP" value="Du 1er avril au 30 juin 2026"></div>
+      <div class="field"><label>LibellÃ©</label><input id="pL" value="3 mois de gestion offerts"></div>
+      <div class="field"><label>PÃ©riode</label><input id="pP" value="Du 1er avril au 30 juin 2026"></div>
     </div>
   </div>
 </div>
 
 <!-- BOUTONS FIXES BAS EDITOR -->
 <div class="acts-fixed">
-  <button class="btn blue" onclick="render();go('preview')">👁️ Aperçu</button>
-  <button class="btn green" onclick="render();go('preview');setTimeout(doPDF,400)">⬇️ PDF</button>
-  <button class="btn purple" onclick="render();go('preview');setTimeout(openMail,400)">✉️ Mail</button>
+  <button class="btn blue" onclick="render();go('preview')">ðï¸ AperÃ§u</button>
+  <button class="btn green" onclick="render();go('preview');setTimeout(doPDF,400)">â¬ï¸ PDF</button>
+  <button class="btn purple" onclick="render();go('preview');setTimeout(openMail,400)">âï¸ Mail</button>
 </div>
 </div>
 
@@ -301,10 +303,10 @@ tr:last-child td{border-bottom:none}
 <div id="preview" class="tab-content">
   <div class="preview-wrap">
     <div class="preview-acts">
-      <button class="btn blue" style="flex:none;padding:11px 14px" onclick="go('editor')">✏️ Modifier</button>
-      <button class="btn green" style="flex:none;padding:11px 14px" onclick="doPDF()">⬇️ PDF</button>
-      <button class="btn purple" style="flex:none;padding:11px 14px" onclick="openMail()">✉️ Mail</button>
-      <button class="btn gray" style="flex:none;padding:11px 14px" onclick="window.print()">🖨️</button>
+      <button class="btn blue" style="flex:none;padding:11px 14px" onclick="go('editor')">âï¸ Modifier</button>
+      <button class="btn green" style="flex:none;padding:11px 14px" onclick="doPDF()">â¬ï¸ PDF</button>
+      <button class="btn purple" style="flex:none;padding:11px 14px" onclick="openMail()">âï¸ Mail</button>
+      <button class="btn gray" style="flex:none;padding:11px 14px" onclick="window.print()">ð¨ï¸</button>
     </div>
     <div class="doc-scroll"><div class="doc" id="docOut"></div></div>
   </div>
@@ -313,7 +315,7 @@ tr:last-child td{border-bottom:none}
 <!-- MODAL MAIL -->
 <div class="modal-bg" id="mailModal">
   <div class="modal-box">
-    <h3>✉️ Envoyer par mail</h3>
+    <h3>âï¸ Envoyer par mail</h3>
     <div class="mf"><label>Destinataire</label><input id="mailTo" type="email" inputmode="email" placeholder="proprietaire@example.com" autocomplete="email"></div>
     <div class="mf"><label>Objet</label><input id="mailSubj" autocomplete="off"></div>
     <div class="mf"><label>Message</label>
@@ -321,23 +323,23 @@ tr:last-child td{border-bottom:none}
 
 Veuillez trouver ci-joint notre proposition commerciale pour la gestion locative de votre bien.
 
-Nous restons à votre disposition pour tout renseignement.
+Nous restons Ã  votre disposition pour tout renseignement.
 
 Cordialement,</textarea>
     </div>
     <div id="mailStatus"></div>
     <div style="display:flex;gap:10px">
-      <button class="btn purple" style="flex:1" id="sendBtn" onclick="sendMail()">📤 Envoyer</button>
+      <button class="btn purple" style="flex:1" id="sendBtn" onclick="sendMail()">ð¤ Envoyer</button>
       <button class="btn out" style="flex:none;padding:12px 18px" onclick="closeModal()">Annuler</button>
     </div>
-    <p class="mfoot">Le PDF sera généré et téléchargé,<br>puis votre app mail s'ouvrira avec le message pré-rempli.</p>
+    <p class="mfoot">Le PDF sera gÃ©nÃ©rÃ© et tÃ©lÃ©chargÃ©,<br>puis votre app mail s'ouvrira avec le message prÃ©-rempli.</p>
   </div>
 </div>
 
 <script>
 const v=id=>document.getElementById(id)?.value||'';
 const n=id=>parseFloat(v(id))||0;
-const f=x=>parseFloat(x).toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})+'\u00a0€';
+const f=x=>parseFloat(x).toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})+'\u00a0â¬';
 
 /* Toast */
 function toast(msg,ms=2800){
@@ -367,130 +369,155 @@ function render(){
   document.getElementById('docOut').innerHTML=`
   <div class="page pb">
     <div class="dh">
-      <h1><span class="c">PROPRIÉTAIRES</span> ON S'OCCUPE<br>DE LA <span class="c">GESTION</span> DE VOTRE BIEN&nbsp;!</h1>
+      <h1><span class="c">PROPRIÃTAIRES</span> ON S'OCCUPE<br>DE LA <span class="c">GESTION</span> DE VOTRE BIEN&nbsp;!</h1>
       <div class="dh-logo"><div class="lt">${v('a1')}</div><div class="lb">${v('a2')}</div><div class="lc">${v('ac')}</div></div>
     </div>
-    <div class="abar">📍 ${v('pa')}</div>
+    <div class="abar">ð ${v('pa')}</div>
     <div class="ds">
-      <div class="st"><span>💶</span> Valeur Locative</div>
-      <p style="font-size:10px;color:#555;margin-bottom:7px">Estimation — <strong>${v('pt')}</strong> · ${surf} m²</p>
+      <div class="st"><span>ð¶</span> Valeur Locative</div>
+      <p style="font-size:10px;color:#555;margin-bottom:7px">Estimation â <strong>${v('pt')}</strong> Â· ${surf} mÂ²</p>
       <table class="zb">
         <thead><tr><th>Type de bail</th><th>Loyer HC</th><th>Charges</th><th>Loyer CC</th></tr></thead>
         <tbody>
-          <tr><td>📄 Location nue</td><td>${f(rN)}</td><td>${ch?f(ch):'—'}</td><td class="amt">${f(rN+ch)}</td></tr>
-          <tr><td>🛋️ Location meublée</td><td>${f(rM)}</td><td>${ch?f(ch):'—'}</td><td class="amt">${f(rM+ch)}</td></tr>
+          <tr><td>ð Location nue</td><td>${f(rN)}</td><td>${ch?f(ch):'â'}</td><td class="amt">${f(rN+ch)}</td></tr>
+          <tr><td>ðï¸ Location meublÃ©e</td><td>${f(rM)}</td><td>${ch?f(ch):'â'}</td><td class="amt">${f(rM+ch)}</td></tr>
         </tbody>
       </table>
     </div>
     <div class="two">
       <div class="col">
-        <div class="st"><span>📋</span> Honoraires Location</div>
+        <div class="st"><span>ð</span> Honoraires Location</div>
         <table class="zb" style="margin-bottom:8px">
           <thead><tr><th>Prestation</th><th style="text-align:center">Loc.</th><th style="text-align:center">Bail.</th></tr></thead>
           <tbody>
-            <tr><td>📢 Commercialisation</td><td></td><td style="text-align:center">✅</td></tr>
-            <tr><td>🔍 Etude dossiers</td><td></td><td style="text-align:center">✅</td></tr>
-            <tr><td>🚪 Visites</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td></tr>
-            <tr><td>📁 Dossier locataire</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td></tr>
-            <tr><td>✍️ Rédaction bail</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td></tr>
-            <tr><td>🏠 Etat des lieux</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td></tr>
-            <tr><td>🤝 Entremise / négo.</td><td></td><td class="offered" style="text-align:center">🎁 Offert</td></tr>
+            <tr><td>ð¢ Commercialisation</td><td></td><td style="text-align:center">â</td></tr>
+            <tr><td>ð Etude dossiers</td><td></td><td style="text-align:center">â</td></tr>
+            <tr><td>ðª Visites</td><td style="text-align:center">â</td><td style="text-align:center">â</td></tr>
+            <tr><td>ð Dossier locataire</td><td style="text-align:center">â</td><td style="text-align:center">â</td></tr>
+            <tr><td>âï¸ RÃ©daction bail</td><td style="text-align:center">â</td><td style="text-align:center">â</td></tr>
+            <tr><td>ð  Etat des lieux</td><td style="text-align:center">â</td><td style="text-align:center">â</td></tr>
+            <tr><td>ð¤ Entremise / nÃ©go.</td><td></td><td class="offered" style="text-align:center">ð Offert</td></tr>
           </tbody>
         </table>
-        <p style="font-size:9px;color:#555;margin-bottom:6px"><strong>Barème :</strong> ${fM} €/m² + ${fE} €/m² EDL</p>
+        <p style="font-size:9px;color:#555;margin-bottom:6px"><strong>BarÃ¨me :</strong> ${fM} â¬/mÂ² + ${fE} â¬/mÂ² EDL</p>
         <table>
           <thead><tr><th>Surface</th><th>Mission</th><th>EDL</th><th>Total</th></tr></thead>
-          <tbody><tr class="hlr"><td>${surf} m²</td><td class="amt">${f(surf*fM)}</td><td class="amt">${f(surf*fE)}</td><td class="amt">${f(n('fT'))}</td></tr></tbody>
+          <tbody><tr class="hlr"><td>${surf} mÂ²</td><td class="amt">${f(surf*fM)}</td><td class="amt">${f(surf*fE)}</td><td class="amt">${f(n('fT'))}</td></tr></tbody>
         </table>
       </div>
       <div class="col">
-        <div class="st"><span>⚙️</span> Honoraires Gestion</div>
-        <div class="ib">⚙️ <strong>${v('gR')}% TTC</strong> des loyers perçus</div>
-        <div class="ib">📦 <strong>${v('gM')}% TTC</strong> à partir de <strong>${v('gT')} lots</strong></div>
-        <p style="font-size:9.5px;color:#555;margin:7px 0 5px;font-weight:bold">Devis personnalisé :</p>
+        <div class="st"><span>âï¸</span> Honoraires Gestion</div>
+        <div class="ib">âï¸ <strong>${v('gR')}% TTC</strong> des loyers perÃ§us</div>
+        <div class="ib">ð¦ <strong>${v('gM')}% TTC</strong> Ã  partir de <strong>${v('gT')} lots</strong></div>
+        <p style="font-size:9.5px;color:#555;margin:7px 0 5px;font-weight:bold">Devis personnalisÃ© :</p>
         <table class="zb">
           <thead><tr><th>Bail</th><th>Brut</th><th>Gestion</th><th>Net</th></tr></thead>
           <tbody>
-            <tr><td>📄 Nue</td><td>${f(rN)}</td><td>${c.mN}</td><td class="amt">${c.nN}</td></tr>
-            <tr><td>🛋️ Meublée</td><td>${f(rM)}</td><td>${c.mM}</td><td class="amt">${c.nM}</td></tr>
+            <tr><td>ð Nue</td><td>${f(rN)}</td><td>${c.mN}</td><td class="amt">${c.nN}</td></tr>
+            <tr><td>ðï¸ MeublÃ©e</td><td>${f(rM)}</td><td>${c.mM}</td><td class="amt">${c.nM}</td></tr>
           </tbody>
         </table>
       </div>
     </div>
     <div class="promo">
-      <div class="promo-ico">🎁</div>
+      <div class="promo-ico">ð</div>
       <div><div class="ps">${v('pP')}</div><div class="pm">${v('pL')}</div></div>
     </div>
     <div class="spacer"></div>
-    <div class="df">${v('a1')} ${v('a2')} ${v('ac')} — agence juridiquement et financièrement indépendante. SAS au capital de ${v('ap')} € — RCS n° ${v('ar')} — ${v('aa')}.</div>
+    <div class="df">${v('a1')} ${v('a2')} ${v('ac')} â agence juridiquement et financiÃ¨rement indÃ©pendante. SAS au capital de ${v('ap')} â¬ â RCS nÂ° ${v('ar')} â ${v('aa')}.</div>
   </div>
 
   <div class="page">
-    <div class="p2h"><strong>${v('a1')} ${v('a2')} ${v('ac')}</strong><span>📍 ${v('pa')}</span></div>
+    <div class="p2h"><strong>${v('a1')} ${v('a2')} ${v('ac')}</strong><span>ð ${v('pa')}</span></div>
     <div class="ds" style="margin-top:12px">
-      <div class="st"><span>🛡️</span> Assurances</div>
-      <p style="font-size:10px;color:#555;margin-bottom:9px"><strong>GLI :</strong> <span class="chip">${v('gi')}% TTC</span> des loyers perçus</p>
+      <div class="st"><span>ð¡ï¸</span> Assurances</div>
+      <p style="font-size:10px;color:#555;margin-bottom:9px"><strong>GLI :</strong> <span class="chip">${v('gi')}% TTC</span> des loyers perÃ§us</p>
       <div class="gg">
-        <div class="gc"><div class="gi">🏦</div><div class="gl">Loyers impayés</div><div class="ga">${v('glL')} €</div><div class="gs">Sans franchise</div></div>
-        <div class="gc"><div class="gi">🔧</div><div class="gl">Détériorations</div><div class="ga">${v('glD')} €</div><div class="gs">Sans franchise</div></div>
-        <div class="gc"><div class="gi">⚖️</div><div class="gl">Protection juridique</div><div class="ga">${v('glJ')} €</div><div class="gs">Seuil : ${v('glS')} €</div></div>
+        <div class="gc"><div class="gi">ð¦</div><div class="gl">Loyers impayÃ©s</div><div class="ga">${v('glL')} â¬</div><div class="gs">Sans franchise</div></div>
+        <div class="gc"><div class="gi">ð§</div><div class="gl">DÃ©tÃ©riorations</div><div class="ga">${v('glD')} â¬</div><div class="gs">Sans franchise</div></div>
+        <div class="gc"><div class="gi">âï¸</div><div class="gl">Protection juridique</div><div class="ga">${v('glJ')} â¬</div><div class="gs">Seuil : ${v('glS')} â¬</div></div>
       </div>
       <table class="zb" style="margin-bottom:9px">
         <thead><tr><th>Bien</th><th>Bail</th><th>Brut</th><th>Gestion</th><th>GLI</th><th>Net final</th></tr></thead>
         <tbody>
-          <tr><td rowspan="2" style="font-weight:bold">${v('pt')}</td><td>📄 Nue</td><td>${f(rN)}</td><td>${c.mN}</td><td>${c.gN}</td><td class="amt">${c.ngN}</td></tr>
-          <tr><td>🛋️ Meublée</td><td>${f(rM)}</td><td>${c.mM}</td><td>${c.gM}</td><td class="amt">${c.ngM}</td></tr>
+          <tr><td rowspan="2" style="font-weight:bold">${v('pt')}</td><td>ð Nue</td><td>${f(rN)}</td><td>${c.mN}</td><td>${c.gN}</td><td class="amt">${c.ngN}</td></tr>
+          <tr><td>ðï¸ MeublÃ©e</td><td>${f(rM)}</td><td>${c.mM}</td><td>${c.gM}</td><td class="amt">${c.ngM}</td></tr>
         </tbody>
       </table>
-      <p style="font-size:10px;color:#555">🏡 <strong>Assurance PNO :</strong> à partir de <strong>${v('pno')} €/an TTC</strong></p>
+      <p style="font-size:10px;color:#555">ð¡ <strong>Assurance PNO :</strong> Ã  partir de <strong>${v('pno')} â¬/an TTC</strong></p>
     </div>
     <div class="ds">
-      <div class="st"><span>✅</span> Services Garantis</div>
+      <div class="st"><span>â</span> Services Garantis</div>
       <div class="svc2">
         <ul class="svcs">
-          <li><span class="ico">👤</span>Interlocuteur unique location &amp; gestion</li>
-          <li><span class="ico">💻</span>Espace client : baux, EDL, comptabilité</li>
-          <li><span class="ico">📨</span>Quittances mensuelles aux locataires</li>
-          <li><span class="ico">💳</span>Loyers reversés le 20 de chaque mois</li>
-          <li><span class="ico">🏢</span>Charges syndic copropriété gérées</li>
-          <li><span class="ico">🚨</span>Relance impayés : tél., courrier, huissier</li>
+          <li><span class="ico">ð¤</span>Interlocuteur unique location &amp; gestion</li>
+          <li><span class="ico">ð»</span>Espace client : baux, EDL, comptabilitÃ©</li>
+          <li><span class="ico">ð¨</span>Quittances mensuelles aux locataires</li>
+          <li><span class="ico">ð³</span>Loyers reversÃ©s le 20 de chaque mois</li>
+          <li><span class="ico">ð¢</span>Charges syndic copropriÃ©tÃ© gÃ©rÃ©es</li>
+          <li><span class="ico">ð¨</span>Relance impayÃ©s : tÃ©l., courrier, huissier</li>
         </ul>
         <ul class="svcs">
-          <li><span class="ico">🏛️</span>Saisie CAF pour locataires APL</li>
-          <li><span class="ico">📋</span>Attestations assurances &amp; chaudière / an</li>
-          <li><span class="ico">📊</span>Aide déclaration fiscale 2044</li>
-          <li><span class="ico">🔄</span>Régularisation annuelle des charges</li>
-          <li><span class="ico">📈</span>Révision annuelle des loyers (IRL)</li>
-          <li><span class="ico">🔨</span>Travaux urgents &lt;175 € gérés directement</li>
+          <li><span class="ico">ðï¸</span>Saisie CAF pour locataires APL</li>
+          <li><span class="ico">ð</span>Attestations assurances &amp; chaudiÃ¨re / an</li>
+          <li><span class="ico">ð</span>Aide dÃ©claration fiscale 2044</li>
+          <li><span class="ico">ð</span>RÃ©gularisation annuelle des charges</li>
+          <li><span class="ico">ð</span>RÃ©vision annuelle des loyers (IRL)</li>
+          <li><span class="ico">ð¨</span>Travaux urgents &lt;175 â¬ gÃ©rÃ©s directement</li>
         </ul>
       </div>
     </div>
     <div class="spacer"></div>
-    <div class="df">${v('a1')} ${v('a2')} ${v('ac')} — agence juridiquement et financièrement indépendante. SAS au capital de ${v('ap')} € — RCS n° ${v('ar')} — ${v('aa')}.</div>
+    <div class="df">${v('a1')} ${v('a2')} ${v('ac')} â agence juridiquement et financiÃ¨rement indÃ©pendante. SAS au capital de ${v('ap')} â¬ â RCS nÂ° ${v('ar')} â ${v('aa')}.</div>
   </div>`;
 }
 
 /* PDF */
-function pdfOpts(name){
-  return{margin:0,filename:name,
-    image:{type:'jpeg',quality:1},
-    html2canvas:{scale:2,useCORS:true,scrollX:0,scrollY:0,windowWidth:794,logging:false},
-    jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},
-    pagebreak:{mode:'avoid-all',before:'.pb'}
-  };
-}
 function pdfName(){return`Proposition_${v('pr')||'bien'}_${v('ac')}.pdf`.replace(/\s+/g,'_');}
 
-function doPDF(){
+async function doPDF(){
   render();
   toast('⏳ Génération du PDF…');
-  html2pdf().set(pdfOpts(pdfName())).from(document.getElementById('docOut')).save()
-    .then(()=>toast('✅ PDF téléchargé !'));
+  const pages = document.querySelectorAll('#docOut .page');
+  const {jsPDF} = window.jspdf;
+  const pdf = new jsPDF({unit:'px',format:[794,1123],orientation:'portrait',compress:true});
+  for(let i=0;i<pages.length;i++){
+    if(i>0) pdf.addPage([794,1123],'portrait');
+    const canvas = await html2canvas(pages[i],{
+      scale:2,useCORS:true,scrollX:0,scrollY:0,
+      width:794,height:1123,
+      windowWidth:794,windowHeight:1123,
+      logging:false,backgroundColor:'#ffffff'
+    });
+    const imgData = canvas.toDataURL('image/jpeg',1.0);
+    pdf.addImage(imgData,'JPEG',0,0,794,1123);
+  }
+  pdf.save(pdfName());
+  toast('✅ PDF téléchargé !');
+}
+
+async function doPDFBlob(){
+  render();
+  const pages = document.querySelectorAll('#docOut .page');
+  const {jsPDF} = window.jspdf;
+  const pdf = new jsPDF({unit:'px',format:[794,1123],orientation:'portrait',compress:true});
+  for(let i=0;i<pages.length;i++){
+    if(i>0) pdf.addPage([794,1123],'portrait');
+    const canvas = await html2canvas(pages[i],{
+      scale:2,useCORS:true,scrollX:0,scrollY:0,
+      width:794,height:1123,
+      windowWidth:794,windowHeight:1123,
+      logging:false,backgroundColor:'#ffffff'
+    });
+    const imgData = canvas.toDataURL('image/jpeg',1.0);
+    pdf.addImage(imgData,'JPEG',0,0,794,1123);
+  }
+  return pdf.output('blob');
 }
 
 /* MAIL */
 function openMail(){
-  document.getElementById('mailSubj').value=`Proposition gestion locative — ${v('pa')}`;
+  document.getElementById('mailSubj').value=`Proposition gestion locative â ${v('pa')}`;
   document.getElementById('mailModal').classList.add('show');
   setStatus('','');
 }
@@ -506,18 +533,17 @@ function sendMail(){
   const body=encodeURIComponent(document.getElementById('mailBody').value);
   const btn=document.getElementById('sendBtn');
   btn.disabled=true;
-  setStatus('⏳ Génération du PDF…','info');
+  setStatus('â³ GÃ©nÃ©ration du PDFâ¦','info');
 
-  html2pdf().set(pdfOpts(pdfName())).from(document.getElementById('docOut'))
-    .outputPdf('blob').then(blob=>{
-      /* Télécharge le PDF */
+  doPDFBlob().then(blob=>{
+      /* TÃ©lÃ©charge le PDF */
       const url=URL.createObjectURL(blob);
       const a=document.createElement('a');
       a.href=url;a.download=pdfName();
       document.body.appendChild(a);a.click();document.body.removeChild(a);
       setTimeout(()=>URL.revokeObjectURL(url),5000);
 
-      setStatus('✅ PDF téléchargé ! Ouverture de votre app mail…','ok');
+      setStatus('â PDF tÃ©lÃ©chargÃ© ! Ouverture de votre app mailâ¦','ok');
       setTimeout(()=>{
         /* Sur Android, ouvre l'app mail native */
         window.location.href=`mailto:${to}?subject=${subj}&body=${body}`;
@@ -525,7 +551,7 @@ function sendMail(){
         setTimeout(closeModal,2000);
       },900);
     }).catch(()=>{
-      setStatus('❌ Erreur PDF. Réessayez.','err');
+      setStatus('â Erreur PDF. RÃ©essayez.','err');
       btn.disabled=false;
     });
 }
