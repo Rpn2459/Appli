@@ -88,7 +88,7 @@ body{font-family:Arial,sans-serif;background:#f0f4f8;font-size:14px;
 .preview-acts{width:100%;max-width:794px;display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
 .doc-scroll{width:100%;overflow:visible;display:flex;justify-content:center;align-items:flex-start}
 
-.scale-container{transform-origin:top center;transition:transform 0.2s ease}
+.scale-container{transform-origin:top center;transition:transform 0.1s ease}
 
 /* ── TOAST NOTIFICATION ── */
 .toast{position:fixed;bottom:calc(80px + env(safe-area-inset-bottom) + 12px);
@@ -307,9 +307,9 @@ function calc(){
   };
 }
 
-function render(){
+function render(targetId = 'docOut'){
   const c=calc(),rN=n('rN'),rM=n('rM'),ch=n('rC'),surf=n('ps'),fM=n('fM'),fE=n('fE');
-  const out=document.getElementById('docOut');
+  const out=document.getElementById(targetId);
   if(!out) return;
   out.innerHTML=`
   <div class="page pb">
@@ -345,7 +345,7 @@ function render(){
           </tbody>
         </table>
         <p style="font-size:9px;color:#555;margin-bottom:6px"><strong>Barème :</strong> ${fM} €/m² + ${fE} €/m² EDL</p>
-        <table>
+        <table style="width:100%">
           <thead><tr><th>Surface</th><th>Mission</th><th>EDL</th><th>Total</th></tr></thead>
           <tbody><tr class="hlr"><td>${surf} m²</td><td class="amt">${f(surf*fM)}</td><td class="amt">${f(surf*fE)}</td><td class="amt">${f(n('fT'))}</td></tr></tbody>
         </table>
@@ -417,7 +417,7 @@ function render(){
   </div>`;
 }
 
-/* PDF PORTRAIT SÉCURISÉ */
+/* GENERATION PDF SECURISEE MAC + ANDROID AVEC CONTRAINTES DE RENDU PIXELS COMPLÈTES */
 function pdfName(){return`Proposition_${v('pr')||'bien'}_${v('ac')}.pdf`.replace(/\s+/g,'_');}
 
 async function generatePDFObject() {
@@ -425,13 +425,24 @@ async function generatePDFObject() {
     document.activeElement.blur();
   }
   
-  render();
+  // 1. ISOLATION ABSOLUE DES POLICES ET DIMENSIONS (Anti-Distorsion Mobile)
+  const cloneContainer = document.createElement('div');
+  cloneContainer.style.position = 'fixed';
+  cloneContainer.style.top = '-20000px';
+  cloneContainer.style.left = '-20000px';
+  cloneContainer.style.width = '794px';
+  cloneContainer.style.maxWidth = '794px';
+  cloneContainer.style.minWidth = '794px';
+  cloneContainer.id = 'docClone';
   
-  const scrollContainer = document.querySelector('.doc-scroll');
-  if(scrollContainer) scrollContainer.scrollLeft = 0;
-  window.scrollTo(0, 0);
+  // Forcer l'application d'un rendu standardisé indépendant de la taille de l'écran du mobile
+  cloneContainer.style.webkitTextSizeAdjust = '100%';
+  cloneContainer.style.textSizeAdjust = '100%';
+  document.body.appendChild(cloneContainer);
   
-  const pages = document.querySelectorAll('#docOut .page');
+  render('docClone');
+  
+  const pages = cloneContainer.querySelectorAll('.page');
   const { jsPDF } = window.jspdf;
   
   const pdf = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4', compress: true });
@@ -439,6 +450,7 @@ async function generatePDFObject() {
   for (let i = 0; i < pages.length; i++) {
     if (i > 0) pdf.addPage('a4', 'p');
     
+    // Forcer html2canvas à photographier dans une fenêtre virtuelle de 794px fixe
     const canvas = await html2canvas(pages[i], {
       scale: 2, 
       useCORS: true, 
@@ -457,6 +469,8 @@ async function generatePDFObject() {
     const imgData = canvas.toDataURL('image/jpeg', 0.92);
     pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297, undefined, 'FAST');
   }
+
+  document.body.removeChild(cloneContainer);
   return pdf;
 }
 
@@ -472,7 +486,7 @@ async function doPDF(){
   }
 }
 
-/* PARTAGE WHATSAPP ET WEB SHARE API */
+/* PARTAGE WHATSAPP DIRECT */
 async function shareWhatsApp() {
   toast('⏳ Préparation du partage…');
   try {
@@ -502,7 +516,7 @@ async function shareWhatsApp() {
   }
 }
 
-/* TABS AVEC MISE À L'ÉCHELLE MOBILE */
+/* TABS AVEC MISE À L'ÉCHELLE MOBILE (POUR L'APERCU VISUEL UNIQUEMENT) */
 function go(t){
   document.querySelectorAll('.tab').forEach((x,i)=>
     x.classList.toggle('active',(i===0&&t==='editor')||(i===1&&t==='preview')));
@@ -510,7 +524,7 @@ function go(t){
   document.getElementById('preview').classList.toggle('active',t==='preview');
   
   if(t==='preview') {
-    render();
+    render('docOut');
     
     const doc = document.getElementById('docOut');
     const scrollWin = document.querySelector('.doc-scroll');
@@ -538,7 +552,7 @@ function go(t){
 }
 
 autoFee();
-render();
+render('docOut');
 </script>
 </body>
 </html>
