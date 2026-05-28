@@ -129,7 +129,7 @@ body{font-family:Arial,sans-serif;background:#f0f4f8;font-size:14px;
 
 table{width:100%;border-collapse:collapse;font-size:10px}
 th{background:#1a2a4a;color:#fff;padding:6px 8px;text-align:left;
-  font-size:9.5px;text-transform:uppercase;letter-spacing:.4px}
+  font-size:9.5px;text-transform:uppercase;letter-spacing:.4px;font-weight:bold}
 td{padding:6px 8px;border-bottom:1px solid #eee;vertical-align:middle}
 tr:last-child td{border-bottom:none}
 .zb tr:nth-child(even) td{background:#f5f9ff}
@@ -175,19 +175,6 @@ tr:last-child td{border-bottom:none}
 .df{background:#1a2a4a;color:#7a8faa;font-size:8px;text-align:center;
   padding:8px 14px;line-height:1.6;margin-top:auto;flex-shrink:0}
 .spacer{flex:1 1 auto}
-
-/* PRINT */
-@media print{
-  .tabs,.editor,.preview-acts,.acts-fixed,.toast{display:none!important}
-  body{background:#fff;padding:0}
-  .preview-wrap{padding:0;background:#fff}
-  .tab-content{display:block!important}
-  .doc-scroll{overflow:visible;background:#fff}
-  .doc{overflow:visible;box-shadow:none;width:210mm;margin:0 auto}
-  .page{width:210mm;height:297mm;overflow:hidden;margin:0}
-  .pb{page-break-after:always;break-after:page}
-  @page{size:A4 portrait;margin:0}
-}
 </style>
 </head>
 <body>
@@ -307,11 +294,9 @@ function calc(){
   };
 }
 
-function render(targetId = 'docOut'){
+function getHTMLContent(){
   const c=calc(),rN=n('rN'),rM=n('rM'),ch=n('rC'),surf=n('ps'),fM=n('fM'),fE=n('fE');
-  const out=document.getElementById(targetId);
-  if(!out) return;
-  out.innerHTML=`
+  return `
   <div class="page pb">
     <div class="dh">
       <h1><span class="c">PROPRIÉTAIRES</span> ON S'OCCUPE<br>DE LA <span class="c">GESTION</span> DE VOTRE BIEN !</h1>
@@ -417,61 +402,88 @@ function render(targetId = 'docOut'){
   </div>`;
 }
 
-/* GENERATION PDF SECURISEE MAC + ANDROID AVEC CONTRAINTES DE RENDU PIXELS COMPLÈTES */
+function render(){
+  const out = document.getElementById('docOut');
+  if(out) out.innerHTML = getHTMLContent();
+}
+
+/* MÉTHODE DE CAPTURE EN IFRAME : SÉCURISÉE AVEC VERROUILLAGE SÉPARÉ DU VIEWPORT MOBILE */
 function pdfName(){return`Proposition_${v('pr')||'bien'}_${v('ac')}.pdf`.replace(/\s+/g,'_');}
 
-async function generatePDFObject() {
-  if(document.activeElement && typeof document.activeElement.blur === 'function') {
-    document.activeElement.blur();
-  }
-  
-  // 1. ISOLATION ABSOLUE DES POLICES ET DIMENSIONS (Anti-Distorsion Mobile)
-  const cloneContainer = document.createElement('div');
-  cloneContainer.style.position = 'fixed';
-  cloneContainer.style.top = '-20000px';
-  cloneContainer.style.left = '-20000px';
-  cloneContainer.style.width = '794px';
-  cloneContainer.style.maxWidth = '794px';
-  cloneContainer.style.minWidth = '794px';
-  cloneContainer.id = 'docClone';
-  
-  // Forcer l'application d'un rendu standardisé indépendant de la taille de l'écran du mobile
-  cloneContainer.style.webkitTextSizeAdjust = '100%';
-  cloneContainer.style.textSizeAdjust = '100%';
-  document.body.appendChild(cloneContainer);
-  
-  render('docClone');
-  
-  const pages = cloneContainer.querySelectorAll('.page');
-  const { jsPDF } = window.jspdf;
-  
-  const pdf = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4', compress: true });
-  
-  for (let i = 0; i < pages.length; i++) {
-    if (i > 0) pdf.addPage('a4', 'p');
-    
-    // Forcer html2canvas à photographier dans une fenêtre virtuelle de 794px fixe
-    const canvas = await html2canvas(pages[i], {
-      scale: 2, 
-      useCORS: true, 
-      scrollX: 0, 
-      scrollY: 0,
-      x: 0,
-      y: 0,
-      width: 794, 
-      height: 1123,
-      windowWidth: 794, 
-      windowHeight: 1123,
-      logging: false, 
-      backgroundColor: '#ffffff'
-    });
-    
-    const imgData = canvas.toDataURL('image/jpeg', 0.92);
-    pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297, undefined, 'FAST');
-  }
+function generatePDFObject() {
+  return new Promise((resolve, reject) => {
+    if(document.activeElement && typeof document.activeElement.blur === 'function') {
+      document.activeElement.blur();
+    }
 
-  document.body.removeChild(cloneContainer);
-  return pdf;
+    // 1. Création d'un Iframe isolé
+    const iframe = document.createElement('iframe');
+    iframe.style.position = 'fixed';
+    iframe.style.top = '-20000px';
+    iframe.style.left = '-20000px';
+    iframe.style.width = '794px';
+    iframe.style.height = '2300px';
+    iframe.style.border = 'none';
+    document.body.appendChild(iframe);
+
+    const docStr = getHTMLContent();
+    const styleLinks = Array.from(document.querySelectorAll('style')).map(s => s.outerHTML).join('\n');
+
+    const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+    iframeDoc.open();
+    // 2. FORCE INTÉGRALE : Injection d'un Viewport fixe de 794px propre à la frame pour écraser le zoom du smartphone
+    iframeDoc.write(`
+      <!DOCTYPE html>
+      <html style="width:794px; min-width:794px;">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=794, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+        ${styleLinks}
+        <style>
+          html, body { background: #ffffff !important; width: 794px !important; min-width: 794px !important; max-width: 794px !important; overflow: visible !important; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+          .page { box-shadow: none !important; margin: 0 !important; width: 794px !important; min-width: 794px !important; max-width: 794px !important; }
+        </style>
+      </head>
+      <body style="width:794px;">
+        <div id="iframeDocOut" style="width:794px;">${docStr}</div>
+      </body>
+      </html>
+    `);
+    iframeDoc.close();
+
+    // 3. Pause technique pour laisser le moteur de rendu mobile se stabiliser à 794px
+    setTimeout(async () => {
+      try {
+        const pages = iframeDoc.querySelectorAll('.page');
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4', compress: true });
+
+        for (let i = 0; i < pages.length; i++) {
+          if (i > 0) pdf.addPage('a4', 'p');
+
+          const canvas = await window.html2canvas(pages[i], {
+            scale: 2,
+            useCORS: true,
+            logging: false,
+            backgroundColor: '#ffffff',
+            width: 794,
+            height: 1123,
+            windowWidth: 794,
+            windowHeight: 1123
+          });
+
+          const imgData = canvas.toDataURL('image/jpeg', 0.92);
+          pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297, undefined, 'FAST');
+        }
+
+        document.body.removeChild(iframe);
+        resolve(pdf);
+      } catch (err) {
+        if(iframe.parentNode) document.body.removeChild(iframe);
+        reject(err);
+      }
+    }, 280);
+  });
 }
 
 async function doPDF(){
@@ -516,7 +528,7 @@ async function shareWhatsApp() {
   }
 }
 
-/* TABS AVEC MISE À L'ÉCHELLE MOBILE (POUR L'APERCU VISUEL UNIQUEMENT) */
+/* TABS AVEC MISE À L'ÉCHELLE MOBILE */
 function go(t){
   document.querySelectorAll('.tab').forEach((x,i)=>
     x.classList.toggle('active',(i===0&&t==='editor')||(i===1&&t==='preview')));
@@ -524,7 +536,7 @@ function go(t){
   document.getElementById('preview').classList.toggle('active',t==='preview');
   
   if(t==='preview') {
-    render('docOut');
+    render();
     
     const doc = document.getElementById('docOut');
     const scrollWin = document.querySelector('.doc-scroll');
@@ -552,7 +564,7 @@ function go(t){
 }
 
 autoFee();
-render('docOut');
+render();
 </script>
 </body>
 </html>
