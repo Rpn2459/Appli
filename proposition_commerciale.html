@@ -78,6 +78,7 @@ body{font-family:Arial,sans-serif;background:#f0f4f8;font-size:14px;
 .btn:active{transform:scale(.97);opacity:.9}
 .btn.blue{background:#2196F3;color:#fff}
 .btn.green{background:#27ae60;color:#fff}
+.btn.whatsapp{background:#25D366;color:#fff}
 .btn.gray{background:#607d8b;color:#fff}
 
 /* ── PREVIEW RESPONSIVE ── */
@@ -263,7 +264,8 @@ tr:last-child td{border-bottom:none}
 
 <div class="acts-fixed">
   <button class="btn blue" onclick="render();go('preview')">👁️ Aperçu</button>
-  <button class="btn green" onclick="render();go('preview');setTimeout(doPDF,400)">💾 Générer le PDF</button>
+  <button class="btn green" onclick="render();go('preview');setTimeout(doPDF,400)">💾 PDF</button>
+  <button class="btn whatsapp" onclick="render();go('preview');setTimeout(shareWhatsApp,400)">💬 WhatsApp</button>
 </div>
 </div>
 
@@ -271,7 +273,8 @@ tr:last-child td{border-bottom:none}
   <div class="preview-wrap">
     <div class="preview-acts">
       <button class="btn blue" style="flex:none;padding:11px 14px" onclick="go('editor')">📝 Modifier</button>
-      <button class="btn green" style="flex:none;padding:11px 14px" onclick="doPDF()">💾 Télécharger le PDF</button>
+      <button class="btn green" style="flex:none;padding:11px 14px" onclick="doPDF()">💾 PDF</button>
+      <button class="btn whatsapp" style="flex:none;padding:11px 14px" onclick="shareWhatsApp()">💬 Partager WhatsApp</button>
       <button class="btn gray" style="flex:none;padding:11px 14px" onclick="window.print()">🖨️</button>
     </div>
     <div class="doc-scroll"><div class="doc" id="docOut"></div></div>
@@ -414,7 +417,7 @@ function render(){
   </div>`;
 }
 
-/* PDF PORTRAIT SÉCURISÉ POUR ANDROID ET DESKTOP */
+/* PDF PORTRAIT SÉCURISÉ */
 function pdfName(){return`Proposition_${v('pr')||'bien'}_${v('ac')}.pdf`.replace(/\s+/g,'_');}
 
 async function generatePDFObject() {
@@ -466,6 +469,42 @@ async function doPDF(){
   } catch(e) {
     console.error(e);
     toast('❌ Erreur lors de la création du PDF.');
+  }
+}
+
+/* PARTAGE WHATSAPP ET WEB SHARE API */
+async function shareWhatsApp() {
+  toast('⏳ Préparation du partage…');
+  try {
+    const pdfObject = await generatePDFObject();
+    const pdfBlob = pdfObject.output('blob');
+    const fileName = pdfName();
+    
+    // Création d'un fichier simulé utilisable par l'API Share native du téléphone
+    const file = new File([pdfBlob], fileName, { type: 'application/pdf' });
+    
+    // Texte descriptif pour l'accompagnement du document
+    const shareText = `Bonjour, veuillez trouver ci-joint notre proposition commerciale de gestion locative concernant le bien situé à : ${v('pa')}.`;
+
+    // 1. Si le smartphone (Android / iOS) supporte le partage de fichier en natif
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({
+        files: [file],
+        text: shareText,
+        title: 'Proposition Gestion Locative'
+      });
+      toast('✅ Document partagé !');
+    } 
+    // 2. Si le partage natif de fichier n'est pas supporté (Mac, PC, ou navigateur limité)
+    else {
+      const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText + " (Le document PDF a été enregistré simultanément dans vos téléchargements)")}`;
+      pdfObject.save(fileName); // Sauvegarde le fichier pour que l'utilisateur l'ait sous la main
+      window.open(waUrl, '_blank');
+      toast('💾 PDF enregistré & WhatsApp ouvert !');
+    }
+  } catch (e) {
+    console.error(e);
+    toast('❌ Échec du partage.');
   }
 }
 
