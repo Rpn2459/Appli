@@ -78,7 +78,7 @@ body{font-family:Arial,sans-serif;background:#f0f4f8;font-size:14px;
 .btn:active{transform:scale(.97);opacity:.9}
 .btn.blue{background:#2196F3;color:#fff}
 .btn.green{background:#27ae60;color:#fff}
-.btn.whatsapp{background:#25D366;color:#fff}
+.btn.share{background:#2980b9;color:#fff}
 .btn.gray{background:#607d8b;color:#fff}
 
 /* ── PREVIEW RESPONSIVE ── */
@@ -252,7 +252,7 @@ tr:last-child td{border-bottom:none}
 <div class="acts-fixed">
   <button class="btn blue" onclick="render();go('preview')">👁️ Aperçu</button>
   <button class="btn green" onclick="render();go('preview');setTimeout(doPDF,400)">💾 PDF</button>
-  <button class="btn whatsapp" onclick="render();go('preview');setTimeout(shareWhatsApp,400)">💬 WhatsApp</button>
+  <button class="btn share" onclick="render();go('preview');setTimeout(shareDocument,400)">📤 Partager</button>
 </div>
 </div>
 
@@ -261,7 +261,7 @@ tr:last-child td{border-bottom:none}
     <div class="preview-acts">
       <button class="btn blue" style="flex:none;padding:11px 14px" onclick="go('editor')">📝 Modifier</button>
       <button class="btn green" style="flex:none;padding:11px 14px" onclick="doPDF()">💾 PDF</button>
-      <button class="btn whatsapp" style="flex:none;padding:11px 14px" onclick="shareWhatsApp()">💬 Partager WhatsApp</button>
+      <button class="btn share" style="flex:none;padding:11px 14px" onclick="shareDocument()">📤 Partager</button>
       <button class="btn gray" style="flex:none;padding:11px 14px" onclick="window.print()">🖨️</button>
     </div>
     <div class="doc-scroll"><div class="doc" id="docOut"></div></div>
@@ -407,7 +407,7 @@ function render(){
   if(out) out.innerHTML = getHTMLContent();
 }
 
-/* MÉTHODE DE CAPTURE EN IFRAME : SÉCURISÉE AVEC VERROUILLAGE SÉPARÉ DU VIEWPORT MOBILE */
+/* RENDU ABSOLU VIA IFRAME AVEC BLOCAGE DU TEXT AUTOSIZING D'ANDROID */
 function pdfName(){return`Proposition_${v('pr')||'bien'}_${v('ac')}.pdf`.replace(/\s+/g,'_');}
 
 function generatePDFObject() {
@@ -416,7 +416,6 @@ function generatePDFObject() {
       document.activeElement.blur();
     }
 
-    // 1. Création d'un Iframe isolé
     const iframe = document.createElement('iframe');
     iframe.style.position = 'fixed';
     iframe.style.top = '-20000px';
@@ -431,27 +430,60 @@ function generatePDFObject() {
 
     const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
     iframeDoc.open();
-    // 2. FORCE INTÉGRALE : Injection d'un Viewport fixe de 794px propre à la frame pour écraser le zoom du smartphone
     iframeDoc.write(`
       <!DOCTYPE html>
-      <html style="width:794px; min-width:794px;">
+      <html style="width:794px !important; min-width:794px !important;">
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=794, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
         ${styleLinks}
         <style>
-          html, body { background: #ffffff !important; width: 794px !important; min-width: 794px !important; max-width: 794px !important; overflow: visible !important; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
-          .page { box-shadow: none !important; margin: 0 !important; width: 794px !important; min-width: 794px !important; max-width: 794px !important; }
+          /* Neutralisation complète et absolue des automatismes d'affichage Android */
+          html, body { 
+            background: #ffffff !important; 
+            width: 794px !important; 
+            min-width: 794px !important; 
+            max-width: 794px !important; 
+            overflow: visible !important; 
+            -webkit-text-size-adjust: none !important; 
+            text-size-adjust: none !important;
+          }
+          .page { 
+            box-shadow: none !important; 
+            margin: 0 !important; 
+            width: 794px !important; 
+            min-width: 794px !important; 
+            max-width: 794px !important; 
+            display: block !important;
+          }
+          /* Sécurité d'alignement strict en pixel des deux colonnes sur mobile */
+          .two { 
+            display: block !important; 
+            width: 758px !important; 
+            margin: 0 18px 10px !important;
+          }
+          .two .col { 
+            float: left !important; 
+            width: 373px !important; 
+          }
+          .two .col:last-child { 
+            float: right !important; 
+            width: 373px !important; 
+          }
+          .page::after, .two::after {
+            content: "";
+            display: table !important;
+            clear: both !important;
+          }
         </style>
       </head>
-      <body style="width:794px;">
-        <div id="iframeDocOut" style="width:794px;">${docStr}</div>
+      <body style="width:794px !important;">
+        <div id="iframeDocOut" style="width:794px !important;">${docStr}</div>
       </body>
       </html>
     `);
     iframeDoc.close();
 
-    // 3. Pause technique pour laisser le moteur de rendu mobile se stabiliser à 794px
     setTimeout(async () => {
       try {
         const pages = iframeDoc.querySelectorAll('.page');
@@ -482,7 +514,7 @@ function generatePDFObject() {
         if(iframe.parentNode) document.body.removeChild(iframe);
         reject(err);
       }
-    }, 280);
+    }, 320); // Léger délai supplémentaire pour stabiliser les styles physiques injectés
   });
 }
 
@@ -498,8 +530,8 @@ async function doPDF(){
   }
 }
 
-/* PARTAGE WHATSAPP DIRECT */
-async function shareWhatsApp() {
+/* LOGIQUE DE PARTAGE WEB SHARE NATIVE (WHATSAPP, SMS, SIGNAL...) */
+async function shareDocument() {
   toast('⏳ Préparation du partage…');
   try {
     const pdfObject = await generatePDFObject();
@@ -520,7 +552,7 @@ async function shareWhatsApp() {
       const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText + " (Le document PDF a été enregistré simultanément dans vos téléchargements)")}`;
       pdfObject.save(fileName);
       window.open(waUrl, '_blank');
-      toast('💾 PDF enregistré & WhatsApp ouvert !');
+      toast('💾 PDF enregistré & Partage ouvert !');
     }
   } catch (e) {
     console.error(e);
@@ -528,7 +560,7 @@ async function shareWhatsApp() {
   }
 }
 
-/* TABS AVEC MISE À L'ÉCHELLE MOBILE */
+/* TABS AVEC MISE À L'ÉCHELLE MOBILE (VISUELLE SEULEMENT) */
 function go(t){
   document.querySelectorAll('.tab').forEach((x,i)=>
     x.classList.toggle('active',(i===0&&t==='editor')||(i===1&&t==='preview')));
