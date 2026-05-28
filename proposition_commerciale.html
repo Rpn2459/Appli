@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="theme-color" content="#1a2a4a">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -21,7 +21,7 @@
 <script>
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/pwa_sw.js')
+      navigator.serviceWorker.register('./pwa_sw.js')
         .then(() => console.log('✅ Service Worker enregistré'))
         .catch(e => console.warn('SW erreur:', e));
     });
@@ -331,9 +331,7 @@ const f=x=>parseFloat(x).toLocaleString('fr-FR',{minimumFractionDigits:2,maximum
 /* Toast */
 function toast(msg,ms=2800){
   const el=document.getElementById('toast');
-  el.textContent=msg;el.classList.add('show');
-  clearTimeout(el._t);
-  el._t=setTimeout(()=>el.classList.remove('show'),ms);
+  if(el){el.textContent=msg;el.classList.add('show');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('show'),ms);}
 }
 
 function autoFee(){
@@ -353,7 +351,9 @@ function calc(){
 
 function render(){
   const c=calc(),rN=n('rN'),rM=n('rM'),ch=n('rC'),surf=n('ps'),fM=n('fM'),fE=n('fE');
-  document.getElementById('docOut').innerHTML=`
+  const out=document.getElementById('docOut');
+  if(!out) return;
+  out.innerHTML=`
   <div class="page pb">
     <div class="dh">
       <h1><span class="c">PROPRIÉTAIRES</span> ON S'OCCUPE<br>DE LA <span class="c">GESTION</span> DE VOTRE BIEN !</h1>
@@ -459,24 +459,39 @@ function render(){
   </div>`;
 }
 
-/* PDF */
+/* PDF PORTRAIT SÉCURISÉ POUR ANDROID */
 function pdfName(){return`Proposition_${v('pr')||'bien'}_${v('ac')}.pdf`.replace(/\s+/g,'_');}
 
 async function generatePDFObject() {
+  // 1. Fermer le clavier actif pour éviter les décalages géométriques sur Android
+  if(document.activeElement && typeof document.activeElement.blur === 'function') {
+    document.activeElement.blur();
+  }
+  
   render();
+  
+  // 2. Forcer temporairement le conteneur à scroller tout en haut avant la capture
+  const scrollContainer = document.querySelector('.doc-scroll');
+  if(scrollContainer) scrollContainer.scrollLeft = 0;
+  window.scrollTo(0, 0);
+  
   const pages = document.querySelectorAll('#docOut .page');
   const { jsPDF } = window.jspdf;
   
+  // Initialisation explicite A4 Portrait en mm
   const pdf = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4', compress: true });
   
   for (let i = 0; i < pages.length; i++) {
     if (i > 0) pdf.addPage('a4', 'p');
     
+    // Config de capture blindée contre les écrans haute densité (retina/android)
     const canvas = await html2canvas(pages[i], {
-      scale: 2, 
+      scale: 2, // Fixe la netteté sans dépendre du DevicePixelRatio du téléphone
       useCORS: true, 
       scrollX: 0, 
       scrollY: 0,
+      x: 0,
+      y: 0,
       width: 794, 
       height: 1123,
       windowWidth: 794, 
@@ -485,8 +500,8 @@ async function generatePDFObject() {
       backgroundColor: '#ffffff'
     });
     
-    const imgData = canvas.toDataURL('image/jpeg', 0.95);
-    pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297);
+    const imgData = canvas.toDataURL('image/jpeg', 0.92);
+    pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297, undefined, 'FAST');
   }
   return pdf;
 }
@@ -498,6 +513,7 @@ async function doPDF(){
     pdf.save(pdfName());
     toast('✅ PDF Portrait téléchargé !');
   } catch(e) {
+    console.error(e);
     toast('❌ Erreur lors de la création du PDF.');
   }
 }
@@ -516,6 +532,7 @@ function openMail(){
 function closeModal(){document.getElementById('mailModal').classList.remove('show');}
 function setStatus(msg,type){
   const el=document.getElementById('mailStatus');
+  if(!el) return;
   el.textContent=msg;el.className=type;el.style.display=msg?'block':'none';
 }
 function sendMail(){
@@ -530,8 +547,11 @@ function sendMail(){
   doPDFBlob().then(blob=>{
       const url=URL.createObjectURL(blob);
       const a=document.createElement('a');
-      a.href=url;a.download=pdfName();
-      document.body.appendChild(a);a.click();document.body.removeChild(a);
+      a.href=url;
+      a.download=pdfName();
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
       setTimeout(()=>URL.revokeObjectURL(url),5000);
 
       setStatus('✅ PDF Portrait téléchargé ! Ouverture de votre app mail…','ok');
@@ -540,7 +560,8 @@ function sendMail(){
         btn.disabled=false;
         setTimeout(closeModal,2000);
       },900);
-    }).catch(()=>{
+    }).catch((err)=>{
+      console.error(err);
       setStatus('❌ Erreur PDF. Réessayez.','err');
       btn.disabled=false;
     });
