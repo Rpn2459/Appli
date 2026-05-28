@@ -66,7 +66,6 @@ body{font-family:Arial,sans-serif;background:#f0f4f8;font-size:14px;
 .field input:focus,.field textarea:focus{outline:none;border-color:#2196F3;
   box-shadow:0 0 0 3px rgba(33,150,243,.15)}
 
-/* Style pour les champs de l'agence bloqués */
 .field input[readonly] {
   background: #f1f5f9 !important;
   color: #64748b !important;
@@ -107,75 +106,85 @@ body{font-family:Arial,sans-serif;background:#f0f4f8;font-size:14px;
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
 /* =========================================
-   DOCUMENT A4 STRUCTURÉ SUR 1 PAGE COMPACTE UNIQUE (794×1123px)
+   DOCUMENT A4 STRUCTURÉ SUR 2 PAGES ENTIÈRES (794×1123px)
    ========================================= */
 .doc{background:#fff;width:794px;margin:0 auto;
   box-shadow:0 2px 20px rgba(0,0,0,.18);
-  font-family:Arial,sans-serif;font-size:10px;line-height:1.3;color:#222}
+  font-family:Arial,sans-serif;font-size:10.5px;line-height:1.45;color:#222}
 .page{width:794px;height:1123px;max-height:1123px;overflow:hidden;display:flex;
   flex-direction:column;position:relative;background:#fff;box-sizing:border-box;}
+.pb{page-break-after:always;break-after:page}
 
-.dh{background:#1a2a4a;color:#fff;padding:12px 20px;display:flex;
+.dh{background:#1a2a4a;color:#fff;padding:20px 24px;display:flex;
   justify-content:space-between;align-items:center;gap:10px;flex-shrink:0}
-.dh h1{font-size:15px;line-height:1.2;font-weight:900;text-transform:uppercase;flex:1}
+.dh h1{font-size:18px;line-height:1.3;font-weight:900;text-transform:uppercase;flex:1}
 .dh h1 .c{color:#2196F3}
 .dh-logo{text-align:right;flex-shrink:0}
-.dh-logo .lt{font-size:17px;font-weight:900;line-height:1}
-.dh-logo .lb{font-size:17px;font-weight:900;color:#2196F3;line-height:1}
-.dh-logo .lc{font-size:8px;color:#aac;margin-top:2px}
+.dh-logo .lt{font-size:20px;font-weight:900;line-height:1}
+.dh-logo .lb{font-size:20px;font-weight:900;color:#2196F3;line-height:1}
+.dh-logo .lc{font-size:9px;color:#aac;margin-top:3px}
 
 .abar{background:#eef5ff;border:1.5px solid #c5dff8;text-align:center;
-  padding:5px 14px;color:#1a2a4a;font-weight:bold;font-size:10px;
-  margin:0 20px 6px;border-radius:0 0 5px 5px;flex-shrink:0}
+  padding:8px 18px;color:#1a2a4a;font-weight:bold;font-size:11px;
+  margin:0 24px 14px;border-radius:0 0 5px 5px;flex-shrink:0}
 
-.st{display:flex;align-items:center;gap:6px;background:#2196F3;color:#fff;
-  font-size:9.5px;font-weight:bold;padding:4px 8px;border-radius:4px;
-  margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px;flex-shrink:0}
+.st{display:flex;align-items:center;gap:7px;background:#2196F3;color:#fff;
+  font-size:10.5px;font-weight:bold;padding:6px 12px;border-radius:4px;
+  margin-bottom:10px;text-transform:uppercase;letter-spacing:.6px;flex-shrink:0}
 
-.ds{margin:0 20px 5px;flex-shrink:0}
+.ds{margin:0 24px 14px;flex-shrink:0}
 
-table{width:100%;border-collapse:collapse;font-size:9.5px}
-th{background:#1a2a4a;color:#fff;padding:4px 6px;text-align:left;
-  font-size:9px;text-transform:uppercase;letter-spacing:.3px;font-weight:bold}
-td{padding:4px 6px;border-bottom:1px solid #eee;vertical-align:middle}
+/* Bloc Interlocuteur sur le PDF */
+.c-info{background:#f8f9fa;border:1px solid #e2e8f0;border-radius:5px;padding:10px 14px;margin:0 24px 14px;font-size:10px;color:#333}
+.c-info strong{color:#1a2a4a}
+
+table{width:100%;border-collapse:collapse;font-size:10px}
+th{background:#1a2a4a;color:#fff;padding:6px 8px;text-align:left;
+  font-size:9.5px;text-transform:uppercase;letter-spacing:.4px;font-weight:bold}
+td{padding:6px 8px;border-bottom:1px solid #eee;vertical-align:middle}
 tr:last-child td{border-bottom:none}
 .zb tr:nth-child(even) td{background:#f5f9ff}
 .amt{color:#2196F3;font-weight:bold}
 .hlr td{background:#1a2a4a;color:#fff;font-weight:bold}
 .hlr .amt{color:#7ecfff}
-.offered{color:#27ae60;font-weight:bold;font-size:9px}
+.offered{color:#27ae60;font-weight:bold;font-size:9.5px}
 
-.two{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:0 20px 5px;flex-shrink:0}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:0 24px 14px;flex-shrink:0}
 .two>.col{min-width:0}
 
-.ib{background:#f0f6ff;border-left:3px solid #2196F3;padding:4px 8px;
-  border-radius:0 4px 4px 0;margin-bottom:4px;font-size:9.5px;color:#333;line-height:1.3}
+.ib{background:#f0f6ff;border-left:3px solid #2196F3;padding:6px 10px;
+  border-radius:0 4px 4px 0;margin-bottom:6px;font-size:10px;color:#333;line-height:1.5}
 
 .promo{background:linear-gradient(130deg,#1a2a4a 55%,#1e3560);color:#fff;
-  padding:6px 14px;margin:0 20px 5px;border-radius:6px;
-  display:flex;align-items:center;gap:12px;flex-shrink:0}
-.promo-ico{font-size:20px;flex-shrink:0}
-.promo .pm{font-size:11.5px;font-weight:bold}
-.promo .ps{font-size:8.5px;color:#aac}
+  padding:12px 20px;margin:0 24px 14px;border-radius:6px;
+  display:flex;align-items:center;gap:14px;flex-shrink:0}
+.promo-ico{font-size:26px;flex-shrink:0}
+.promo .pm{font-size:13.5px;font-weight:bold}
+.promo .ps{font-size:9.5px;color:#aac}
 
-.gg{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:4px}
-.gc{background:#eef5ff;border:1.5px solid #c5dff8;border-radius:4px;padding:4px 2px;text-align:center}
-.gc .gi{font-size:12px;margin-bottom:1px}
-.gc .gl{font-size:8px;color:#666;text-transform:uppercase;letter-spacing:.2px}
-.gc .ga{font-size:10.5px;font-weight:bold;color:#1a2a4a;margin:1px 0}
-.gc .gs{font-size:7.5px;color:#888}
+.gg{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px}
+.gc{background:#eef5ff;border:1.5px solid #c5dff8;border-radius:4px;padding:8px 4px;text-align:center}
+.gc .gi{font-size:16px;margin-bottom:2px}
+.gc .gl{font-size:8.5px;color:#666;text-transform:uppercase;letter-spacing:.3px}
+.gc .ga{font-size:12.5px;font-weight:bold;color:#1a2a4a;margin:2px 0}
+.gc .gs{font-size:8px;color:#888}
 
-.svc2{display:grid;grid-template-columns:1fr 1fr;gap:0 8px}
+.svc2{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
 .svcs{list-style:none}
-.svcs li{padding:2px 0;border-bottom:1px solid #f0f4ff;font-size:8.5px;
-  color:#333;display:flex;gap:4px;line-height:1.25}
-.svcs li .ico{width:12px;text-align:center;flex-shrink:0;font-size:9px}
+.svcs li{padding:4px 0;border-bottom:1px solid #f0f4ff;font-size:9.5px;
+  color:#333;display:flex;gap:5px;line-height:1.35}
+.svcs li .ico{width:14px;text-align:center;flex-shrink:0;font-size:10px}
 
-.chip{display:inline-block;background:#e8f4fd;color:#1565c0;font-size:8px;
-  font-weight:bold;padding:0px 4px;border-radius:5px;border:1px solid #b3d9f7}
+.p2h{background:#1a2a4a;color:#fff;padding:10px 24px;
+  display:flex;justify-content:space-between;align-items:center;
+  font-size:10.5px;flex-shrink:0;margin-bottom:14px}
+.p2h strong{color:#2196F3}
 
-.df{background:#1a2a4a;color:#7a8faa;font-size:7.5px;text-align:center;
-  padding:5px 12px;line-height:1.4;margin-top:auto;flex-shrink:0}
+.chip{display:inline-block;background:#e8f4fd;color:#1565c0;font-size:8.5px;
+  font-weight:bold;padding:1px 5px;border-radius:5px;border:1px solid #b3d9f7}
+
+.df{background:#1a2a4a;color:#7a8faa;font-size:8px;text-align:center;
+  padding:8px 16px;line-height:1.5;margin-top:auto;flex-shrink:0}
 .spacer{flex:1 1 auto}
 
 /* PRINT */
@@ -187,6 +196,7 @@ tr:last-child td{border-bottom:none}
   .doc-scroll{overflow:visible;background:#fff}
   .doc{overflow:visible;box-shadow:none;width:210mm;margin:0 auto}
   .page{width:210mm;height:297mm;max-height:297mm;overflow:hidden;margin:0}
+  .pb{page-break-after:always;break-after:page}
   @page{size:A4 portrait;margin:0}
 }
 </style>
@@ -212,6 +222,15 @@ tr:last-child td{border-bottom:none}
       <div class="field"><label>Adresse agence</label><input id="aa" value="8 rue de l'Ecusserie 62500 Saint-Omer" readonly></div>
       <div class="field"><label>N° RCS</label><input id="ar" value="905000402" readonly></div>
       <div class="field"><label>Capital (€)</label><input id="ap" value="12 000" readonly></div>
+    </div>
+  </div>
+
+  <div class="esec"><h3>👤 Votre profil Conseiller (Sauvegarde automatique)</h3>
+    <div class="grid">
+      <div class="field"><label>Nom</label><input id="cNom" value="" placeholder="Ex: Planchon" oninput="saveRep()"></div>
+      <div class="field"><label>Prénom</label><input id="cPre" value="" placeholder="Ex: Rémi" oninput="saveRep()"></div>
+      <div class="field"><label>Numéro de tel</label><input id="cT" value="" type="tel" placeholder="Ex: 06 00 00 00 00" oninput="saveRep()"></div>
+      <div class="field"><label>Adresse mail</label><input id="cE" value="" type="email" placeholder="Ex: r.planchon@guyhoquet.com" oninput="saveRep()"></div>
     </div>
   </div>
 
@@ -287,6 +306,20 @@ const v=id=>document.getElementById(id)?.value||'';
 const n=id=>parseFloat(v(id))||0;
 const f=x=>parseFloat(x).toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})+'\u00a0€';
 
+/* Gestion de la mémoire locale pour le mobile */
+function loadRep(){
+  if(localStorage.getItem('propimmo_cNom')) document.getElementById('cNom').value = localStorage.getItem('propimmo_cNom');
+  if(localStorage.getItem('propimmo_cPre')) document.getElementById('cPre').value = localStorage.getItem('propimmo_cPre');
+  if(localStorage.getItem('propimmo_cT')) document.getElementById('cT').value = localStorage.getItem('propimmo_cT');
+  if(localStorage.getItem('propimmo_cE')) document.getElementById('cE').value = localStorage.getItem('propimmo_cE');
+}
+function saveRep(){
+  localStorage.setItem('propimmo_cNom', document.getElementById('cNom').value);
+  localStorage.setItem('propimmo_cPre', document.getElementById('cPre').value);
+  localStorage.setItem('propimmo_cT', document.getElementById('cT').value);
+  localStorage.setItem('propimmo_cE', document.getElementById('cE').value);
+}
+
 /* Toast */
 function toast(msg,ms=2800){
   const el=document.getElementById('toast');
@@ -308,23 +341,24 @@ function calc(){
   };
 }
 
-function getHTMLContent(){
+function getHTMLPage1(){
   const c=calc(),rN=n('rN'),rM=n('rM'),ch=n('rC'),surf=n('ps'),fM=n('fM'),fE=n('fE');
   return `
   <div class="page">
     <div class="dh">
-      <h1><span class="c">PROPRIÉTAIRES</span> ON S'OCCUPE DE LA <span class="c">GESTION</span> DE VOTRE BIEN !</h1>
+      <h1><span class="c">PROPRIÉTAIRES</span> ON S'OCCUPE<br>DE LA <span class="c">GESTION</span> DE VOTRE BIEN !</h1>
       <div class="dh-logo"><div class="lt">${v('a1')}</div><div class="lb">${v('a2')}</div><div class="lc">${v('ac')}</div></div>
     </div>
     <div class="abar">📍 ${v('pa')}</div>
     
     <div class="ds">
-      <div class="st"><span>💰</span> Valeur Locative & Estimation</div>
+      <div class="st"><span>💰</span> Valeur Locative</div>
+      <p style="font-size:10px;color:#555;margin-bottom:7px">Estimation — <strong>${v('pt')}</strong> · ${surf} m²</p>
       <table class="zb">
-        <thead><tr><th>Type de bail</th><th>Loyer Hors Charges</th><th>Provision Charges</th><th>Loyer CC unique</th></tr></thead>
+        <thead><tr><th>Type de bail</th><th>Loyer HC</th><th>Charges</th><th>Loyer CC</th></tr></thead>
         <tbody>
-          <tr><td>📄 Location nue (estimation globale)</td><td>${f(rN)}</td><td>${ch?f(ch):'—'}</td><td class="amt">${f(rN+ch)}</td></tr>
-          <tr><td>🛋️ Location meublée (estimation globale)</td><td>${f(rM)}</td><td>${ch?f(ch):'—'}</td><td class="amt">${f(rM+ch)}</td></tr>
+          <tr><td>📄 Location nue</td><td>${f(rN)}</td><td>${ch?f(ch):'—'}</td><td class="amt">${f(rN+ch)}</td></tr>
+          <tr><td>🛋️ Location meublée</td><td>${f(rM)}</td><td>${ch?f(ch):'—'}</td><td class="amt">${f(rM+ch)}</td></tr>
         </tbody>
       </table>
     </div>
@@ -332,26 +366,31 @@ function getHTMLContent(){
     <div class="two">
       <div class="col">
         <div class="st"><span>📋</span> Honoraires Location</div>
-        <table class="zb" style="margin-bottom:4px">
+        <table class="zb" style="margin-bottom:8px">
           <thead><tr><th>Prestation</th><th style="text-align:center">Loc.</th><th style="text-align:center">Bail.</th></tr></thead>
           <tbody>
-            <tr><td>📢 Comm. & Visites</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td></tr>
-            <tr><td>📄 Étude dossiers & Bail</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td></tr>
-            <tr><td>🏡 État des lieux (EDL)</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td></tr>
+            <tr><td>📢 Commercialisation</td><td></td><td style="text-align:center">✅</td></tr>
+            <tr><td>🔍 Étude dossiers</td><td></td><td style="text-align:center">✅</td></tr>
+            <tr><td>🚪 Visites</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td></tr>
+            <tr><td>📄 Dossier locataire</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td></tr>
+            <tr><td>✍️ Rédaction bail</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td></tr>
+            <tr><td>🏡 État des lieux</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td></tr>
             <tr><td>🤝 Entremise / négo.</td><td></td><td class="offered" style="text-align:center">🎁 Offert</td></tr>
           </tbody>
         </table>
+        <p style="font-size:9px;color:#555;margin-bottom:6px"><strong>Barème :</strong> ${fM} €/m² + ${fE} €/m² EDL</p>
         <table style="width:100%">
-          <thead><tr><th>Surface</th><th>Mission</th><th>EDL</th><th>Total Facturé</th></tr></thead>
+          <thead><tr><th>Surface</th><th>Mission</th><th>EDL</th><th>Total</th></tr></thead>
           <tbody><tr class="hlr"><td>${surf} m²</td><td class="amt">${f(surf*fM)}</td><td class="amt">${f(surf*fE)}</td><td class="amt">${f(n('fT'))}</td></tr></tbody>
         </table>
       </div>
       <div class="col">
         <div class="st"><span>⚙️</span> Honoraires Gestion</div>
-        <div class="ib">⚙️ Standard : <strong>${v('gR')}% TTC</strong> des encaissements</div>
-        <div class="ib">📦 Multi-lots : <strong>${v('gM')}% TTC</strong> (dès <strong>${v('gT')} lots</strong>)</div>
-        <table class="zb" style="margin-top:4px">
-          <thead><tr><th>Bail</th><th>Loyer Brut</th><th>Gestion</th><th>Revenu Net</th></tr></thead>
+        <div class="ib">⚙️ <strong>${v('gR')}% TTC</strong> des loyers perçus</div>
+        <div class="ib">📦 <strong>${v('gM')}% TTC</strong> à partir de <strong>${v('gT')} lots</strong></div>
+        <p style="font-size:9.5px;color:#555;margin:7px 0 5px;font-weight:bold">Devis personnalisé :</p>
+        <table class="zb">
+          <thead><tr><th>Bail</th><th>Brut</th><th>Gestion</th><th>Net</th></tr></thead>
           <tbody>
             <tr><td>📄 Nue</td><td>${f(rN)}</td><td>${c.mN}</td><td class="amt">${c.nN}</td></tr>
             <tr><td>🛋️ Meublée</td><td>${f(rM)}</td><td>${c.mM}</td><td class="amt">${c.nM}</td></tr>
@@ -360,50 +399,68 @@ function getHTMLContent(){
       </div>
     </div>
 
-    <div class="two">
-      <div class="col">
-        <div class="st"><span>🛡️</span> Sécurités & Assurances</div>
-        <p style="font-size:8.5px;color:#555;margin-bottom:4px"><strong>Option GLI :</strong> <span class="chip">${v('gi')}% TTC</span> sans franchise</p>
-        <div class="gg">
-          <div class="gc"><div class="gi">🏦</div><div class="gl">Impayés</div><div class="ga">${v('glL')} €</div><div class="gs">Max</div></div>
-          <div class="gc"><div class="gi">🔧</div><div class="gl">Dégrad.</div><div class="ga">${v('glD')} €</div><div class="gs">Max</div></div>
-          <div class="gc"><div class="gi">⚖️</div><div class="gl">Protection juridique</div><div class="ga">${v('glJ')} €</div><div class="gs">Seuil ${v('glS')}€</div></div>
-        </div>
-        <table class="zb" style="margin-bottom:4px">
-          <thead><tr><th>Bail</th><th>Gestion + GLI</th><th>Net Final Sécurisé</th></tr></thead>
-          <tbody>
-            <tr><td>📄 Nue</td><td>${f(n('rN')*(n('gR')/100 + n('gi')/100))}</td><td class="amt">${c.ngN}</td></tr>
-            <tr><td>🛋️ Meublée</td><td>${f(n('rM')*(n('gR')/100 + n('gi')/100))}</td><td class="amt">${c.ngM}</td></tr>
-          </tbody>
-        </table>
-        <p style="font-size:8.5px;color:#555">🏡 <strong>Assurance PNO :</strong> à partir de <strong>${v('pno')} €/an TTC</strong></p>
-      </div>
-      <div class="col">
-        <div class="st"><span>✅</span> 12 Services Inclus de Gestion</div>
-        <div class="svc2">
-          <ul class="svcs">
-            <li><span class="ico">👤</span>Interlocuteur unique direct</li>
-            <li><span class="ico">💻</span>Espace extranet 24h/24</li>
-            <li><span class="ico">📨</span>Quittances et avis mensuels</li>
-            <li><span class="ico">💳</span>Reversement des loyers le 20</li>
-            <li><span class="ico">🏢</span>Gestion des charges syndic</li>
-            <li><span class="ico">🚨</span>Relances et suivi contentieux</li>
-          </ul>
-          <ul class="svcs">
-            <li><span class="ico">⛺</span>Gestion complète dossiers CAF</li>
-            <li><span class="ico">📋</span>Vérification baux & ass.</li>
-            <li><span class="ico">📊</span>Rapport d'aide fiscale annuel</li>
-            <li><span class="ico">🔄</span>Régularisation des charges</li>
-            <li><span class="ico">📈</span>Révision IRL automatique</li>
-            <li><span class="ico">🔨</span>Suivi petits travaux &lt; 175 €</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-
     <div class="promo">
       <div class="promo-ico">🎁</div>
       <div><div class="ps">${v('pP')}</div><div class="pm">${v('pL')}</div></div>
+    </div>
+    
+    <div class="spacer"></div>
+    <div class="df">${v('a1')} ${v('a2')} ${v('ac')} — agence juridiquement et financièrement indépendante. SAS au capital de ${v('ap')} € — RCS n° ${v('ar')} — ${v('aa')}.</div>
+  </div>`;
+}
+
+function getHTMLPage2(){
+  const c=calc(),rN=n('rN'),rM=n('rM');
+  const hasRep = v('cNom') || v('cPre') || v('cT') || v('cE');
+  const fullName = [v('cPre'), v('cNom')].filter(Boolean).join(' ');
+  
+  return `
+  <div class="page">
+    <div class="p2h"><strong>${v('a1')} ${v('a2')} ${v('ac')}</strong><span>📍 ${v('pa')}</span></div>
+    
+    ${hasRep ? `
+    <div class="c-info">
+      Votre conseiller dédié : <strong>${fullName || '—'}</strong> ${v('cT') ? ' · 📞 ' + v('cT') : ''} ${v('cE') ? ' · ✉️ ' + v('cE') : ''}
+    </div>` : ''}
+
+    <div class="ds" style="margin-top:2px">
+      <div class="st"><span>🛡️</span> Assurances & Protections</div>
+      <p style="font-size:10px;color:#555;margin-bottom:9px"><strong>Option GLI :</strong> <span class="chip">${v('gi')}% TTC</span> des loyers perçus</p>
+      <div class="gg">
+        <div class="gc"><div class="gi">🏦</div><div class="gl">Loyers impayés</div><div class="ga">${v('glL')} €</div><div class="gs">Sans franchise</div></div>
+        <div class="gc"><div class="gi">🔧</div><div class="gl">Détériorations</div><div class="ga">${v('glD')} €</div><div class="gs">Sans franchise</div></div>
+        <div class="gc"><div class="gi">⚖️</div><div class="gl">Protection juridique</div><div class="ga">${v('glJ')} €</div><div class="gs">Seuil : ${v('glS')} €</div></div>
+      </div>
+      <table class="zb" style="margin-bottom:12px">
+        <thead><tr><th>Bien</th><th>Bail</th><th>Brut</th><th>Gestion</th><th>GLI</th><th>Net final sécurisé</th></tr></thead>
+        <tbody>
+          <tr><td rowspan="2" style="font-weight:bold">${v('pt')}</td><td>📄 Nue</td><td>${f(rN)}</td><td>${c.mN}</td><td>${c.gN}</td><td class="amt">${c.ngN}</td></tr>
+          <tr><td>🛋️ Meublée</td><td>${f(rM)}</td><td>${c.mM}</td><td>${c.gM}</td><td class="amt">${c.ngM}</td></tr>
+        </tbody>
+      </table>
+      <p style="font-size:10px;color:#555">🏡 <strong>Assurance PNO :</strong> à partir de <strong>${v('pno')} €/an TTC</strong></p>
+    </div>
+
+    <div class="ds">
+      <div class="st"><span>✅</span> Services Garantis de Gestion</div>
+      <div class="svc2">
+        <ul class="svcs">
+          <li><span class="ico">👤</span>Interlocuteur unique location & gestion</li>
+          <li><span class="ico">💻</span>Espace client : baux, EDL, comptabilité</li>
+          <li><span class="ico">📨</span>Quittances mensuelles aux locataires</li>
+          <li><span class="ico">💳</span>Loyers reversés le 20 de chaque mois</li>
+          <li><span class="ico">🏢</span>Charges syndic copropriété gérées</li>
+          <li><span class="ico">🚨</span>Relance impayés : tél., courrier, huissier</li>
+        </ul>
+        <ul class="svcs">
+          <li><span class="ico">⛺</span>Saisie CAF pour locataires APL</li>
+          <li><span class="ico">📋</span>Attestations assurances & chaudière / an</li>
+          <li><span class="ico">📊</span>Aide déclaration fiscale 2044</li>
+          <li><span class="ico">🔄</span>Régularisation annuelle des charges</li>
+          <li><span class="ico">📈</span>Révision annuelle des loyers (IRL)</li>
+          <li><span class="ico">🔨</span>Travaux urgents &lt; 175 € gérés directement</li>
+        </ul>
+      </div>
     </div>
 
     <div class="spacer"></div>
@@ -411,20 +468,20 @@ function getHTMLContent(){
   </div>`;
 }
 
+function getHTMLContent(){
+  return getHTMLPage1() + getHTMLPage2();
+}
+
 function render(){
   const out = document.getElementById('docOut');
   if(out) out.innerHTML = getHTMLContent();
 }
 
-/* RENDU MAXIMUM SECURISE 1 PAGE COMPACTE PAR IFRAME SANS AUTO-SIZING */
+/* RENDU UNITAIRE SANS DECALAGE MOBILES */
 function pdfName(){return`Proposition_${v('pr')||'bien'}_${v('ac')}.pdf`.replace(/\s+/g,'_');}
 
-function generatePDFObject() {
+function generatePDFPageObject(htmlMarkup) {
   return new Promise((resolve, reject) => {
-    if(document.activeElement && typeof document.activeElement.blur === 'function') {
-      document.activeElement.blur();
-    }
-
     const iframe = document.createElement('iframe');
     iframe.style.position = 'fixed';
     iframe.style.top = '-20000px';
@@ -434,10 +491,9 @@ function generatePDFObject() {
     iframe.style.border = 'none';
     document.body.appendChild(iframe);
 
-    const docStr = getHTMLContent();
     const styleLinks = Array.from(document.querySelectorAll('style')).map(s => s.outerHTML).join('\n');
-
     const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+    
     iframeDoc.open();
     iframeDoc.write(`
       <!DOCTYPE html>
@@ -466,21 +522,22 @@ function generatePDFObject() {
             max-width: 794px !important; 
             height: 1123px !important;
             max-height: 1123px !important;
-            display: block !important;
+            display: flex !important;
+            flex-direction: column !important;
             overflow: hidden !important;
           }
           .two { 
             display: block !important; 
-            width: 754px !important; 
-            margin: 0 20px 5px !important;
+            width: 746px !important; 
+            margin: 0 24px 14px !important;
           }
           .two .col { 
             float: left !important; 
-            width: 371px !important; 
+            width: 365px !important; 
           }
           .two .col:last-child { 
             float: right !important; 
-            width: 371px !important; 
+            width: 365px !important; 
           }
           .page::after, .two::after {
             content: "";
@@ -490,7 +547,7 @@ function generatePDFObject() {
         </style>
       </head>
       <body style="width:794px !important; height:1123px !important; max-height:1123px !important;">
-        <div id="iframeDocOut" style="width:794px !important; height:1123px !important; max-height:1123px !important;">${docStr}</div>
+        <div id="iframeDocOut" style="width:794px !important; height:1123px !important; max-height:1123px !important;">${htmlMarkup}</div>
       </body>
       </html>
     `);
@@ -498,11 +555,8 @@ function generatePDFObject() {
 
     setTimeout(async () => {
       try {
-        const pages = iframeDoc.querySelectorAll('.page');
-        const { jsPDF } = window.jspdf;
-        const pdf = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4', compress: true });
-
-        const canvas = await window.html2canvas(pages[0], {
+        const pageNode = iframeDoc.querySelector('.page');
+        const canvas = await window.html2canvas(pageNode, {
           scale: 2,
           useCORS: true,
           logging: false,
@@ -512,33 +566,50 @@ function generatePDFObject() {
           windowWidth: 794,
           windowHeight: 1123
         });
-
-        const imgData = canvas.toDataURL('image/jpeg', 0.94);
-        pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297, undefined, 'FAST');
-
         document.body.removeChild(iframe);
-        resolve(pdf);
+        resolve(canvas);
       } catch (err) {
         if(iframe.parentNode) document.body.removeChild(iframe);
         reject(err);
       }
-    }, 320);
+    }, 280);
   });
 }
 
+async function generatePDFObject() {
+  if(document.activeElement && typeof document.activeElement.blur === 'function') {
+    document.activeElement.blur();
+  }
+  
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4', compress: true });
+  
+  const canvas1 = await generatePDFPageObject(getHTMLPage1());
+  const imgData1 = canvas1.toDataURL('image/jpeg', 0.94);
+  pdf.addImage(imgData1, 'JPEG', 0, 0, 210, 297, undefined, 'FAST');
+  
+  pdf.addPage('a4', 'p');
+  
+  const canvas2 = await generatePDFPageObject(getHTMLPage2());
+  const imgData2 = canvas2.toDataURL('image/jpeg', 0.94);
+  pdf.addImage(imgData2, 'JPEG', 0, 0, 210, 297, undefined, 'FAST');
+  
+  return pdf;
+}
+
 async function doPDF(){
-  toast('⏳ Génération du PDF 1 page…');
+  toast('⏳ Génération du PDF…');
   try {
     const pdf = await generatePDFObject();
     pdf.save(pdfName());
-    toast('✅ PDF 1 page unique téléchargé !');
+    toast('✅ PDF 2 pages téléchargé !');
   } catch(e) {
     console.error(e);
     toast('❌ Erreur lors de la création du PDF.');
   }
 }
 
-/* LOGIQUE DE PARTAGE WEB SHARE NATIVE 1 PAGE */
+/* LOGIQUE DE PARTAGE WEB SHARE NATIVE */
 async function shareDocument() {
   toast('⏳ Préparation du partage…');
   try {
@@ -593,7 +664,7 @@ function go(t){
         const wrapper = document.createElement('div');
         wrapper.className = 'scale-container';
         wrapper.style.width = '794px';
-        wrapper.style.height = (1123 * scaleFactor) + 'px'; 
+        wrapper.style.height = (1123 * 2 * scaleFactor) + 'px'; 
         wrapper.style.transform = `scale(${scaleFactor})`;
         
         doc.parentNode.insertBefore(wrapper, doc);
@@ -603,6 +674,8 @@ function go(t){
   }
 }
 
+// Chargement initial des informations du conseiller
+loadRep();
 autoFee();
 render();
 </script>
