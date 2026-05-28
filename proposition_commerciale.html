@@ -84,9 +84,13 @@ body{font-family:Arial,sans-serif;background:#f0f4f8;font-size:14px;
 
 /* ── PREVIEW ── */
 .preview-wrap{background:#cdd4db;padding:12px;
-  padding-bottom:calc(80px + env(safe-area-inset-bottom))}
-.preview-acts{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
-.doc-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:4px}
+  padding-bottom:calc(80px + env(safe-area-inset-bottom));
+  display:flex;flex-direction:column;align-items:center}
+.preview-acts{width:100%;max-width:794px;display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.doc-scroll{width:100%;overflow:visible;display:flex;justify-content:center;align-items:flex-start}
+
+/* Conteneur de mise à l'échelle pour les écrans mobiles */
+.scale-container{transform-origin:top center;transition:transform 0.2s ease}
 
 /* ── TOAST NOTIFICATION ── */
 .toast{position:fixed;bottom:calc(80px + env(safe-area-inset-bottom) + 12px);
@@ -567,13 +571,41 @@ function sendMail(){
     });
 }
 
-/* TABS */
+/* TABS AVEC MISE À L'ÉCHELLE MOBILE */
 function go(t){
   document.querySelectorAll('.tab').forEach((x,i)=>
     x.classList.toggle('active',(i===0&&t==='editor')||(i===1&&t==='preview')));
   document.getElementById('editor').classList.toggle('active',t==='editor');
   document.getElementById('preview').classList.toggle('active',t==='preview');
-  if(t==='preview') render();
+  
+  if(t==='preview') {
+    render();
+    
+    // Encapsulation et redimensionnement dynamique pour l'écran mobile
+    const doc = document.getElementById('docOut');
+    const scrollWin = document.querySelector('.doc-scroll');
+    if(doc && scrollWin) {
+      // Annule un éventuel habillage précédent
+      if (doc.parentNode.classList.contains('scale-container')) {
+        const parent = doc.parentNode;
+        parent.parentNode.insertBefore(doc, parent);
+        parent.parentNode.removeChild(parent);
+      }
+      
+      const availableWidth = scrollWin.clientWidth;
+      if(availableWidth < 794) {
+        const scaleFactor = availableWidth / 794;
+        const wrapper = document.createElement('div');
+        wrapper.className = 'scale-container';
+        wrapper.style.width = '794px';
+        wrapper.style.height = (1123 * 2 * scaleFactor) + 'px'; // Ajuste la hauteur du conteneur pour le défilement vertical
+        wrapper.style.transform = `scale(${scaleFactor})`;
+        
+        doc.parentNode.insertBefore(wrapper, doc);
+        wrapper.appendChild(doc);
+      }
+    }
+  }
 }
 
 autoFee();
