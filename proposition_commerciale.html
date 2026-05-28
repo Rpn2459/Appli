@@ -207,8 +207,8 @@ tr:last-child td{border-bottom:none}
   body{background:#fff;padding:0}
   .preview-wrap{padding:0;background:#fff}
   .tab-content{display:block!important}
-  .doc-scroll,.doc{overflow:visible;box-shadow:none;width:100%;max-width:100%}
-  .page{width:100%;height:297mm;overflow:hidden}
+  .doc-scroll,.doc{overflow:visible;box-shadow:none;width:794px;max-width:794px}
+  .page{width:100%;min-height:297mm;overflow:visible}
   .pb{page-break-after:always;break-after:page}
   @page{size:A4 portrait;margin:0}
 }
@@ -474,9 +474,9 @@ function render(){
 function pdfOpts(name){
   return{margin:0,filename:name,
     image:{type:'jpeg',quality:1},
-    html2canvas:{scale:2,useCORS:true,scrollX:0,scrollY:0,windowWidth:794,windowHeight:1123,logging:false},
+    html2canvas:{scale:2,useCORS:true,scrollX:0,scrollY:0,windowWidth:794,logging:false},
     jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},
-    pagebreak:{mode:'css',before:'.pb'}
+    pagebreak:{mode:'avoid-all',before:'.pb'}
   };
 }
 function pdfName(){return`Proposition_${v('pr')||'bien'}_${v('ac')}.pdf`.replace(/\s+/g,'_');}
