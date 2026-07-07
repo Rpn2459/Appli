@@ -246,8 +246,8 @@ tr:last-child td{border-bottom:none}
 
   <div class="esec"><h3>💰 Loyers</h3>
     <div class="grid">
-      <div class="field"><label>Loyer nu HC (€)</label><input id="rN" value="630" type="number" inputmode="decimal"></div>
-      <div class="field"><label>Loyer meublé HC (€)</label><input id="rM" value="660" type="number" inputmode="decimal"></div>
+      <div class="field"><label>Loyer nu HC (€)</label><input id="rN" value="630" type="number" inputmode="decimal" oninput="autoFee()"></div>
+      <div class="field"><label>Loyer meublé HC (€)</label><input id="rM" value="660" type="number" inputmode="decimal" oninput="autoFee()"></div>
       <div class="field"><label>Charges locatives (€)</label><input id="rC" value="0" type="number" inputmode="decimal"></div>
     </div>
   </div>
@@ -329,7 +329,7 @@ function toast(msg,ms=2800){
 
 function autoFee(){
   const s=n('ps'),m=n('fM'),e=n('fE');
-  if(s&&m&&e) document.getElementById('fT').value=(s*(m+e)).toFixed(2);
+  if(s&&m&&e){let total=s*(m+e);const cap=Math.max(n('rN'),n('rM'));if(cap>0&&total>cap)total=cap;document.getElementById('fT').value=total.toFixed(2);}
 }
 
 function calc(){
@@ -359,7 +359,7 @@ function getHTMLPage1(){
         <thead><tr><th>Type de bail</th><th>Loyer HC</th><th>Charges</th><th>Loyer CC</th></tr></thead>
         <tbody>
           <tr><td>📄 Location nue</td><td>${f(rN)}</td><td>${ch?f(ch):'—'}</td><td class="amt">${f(rN+ch)}</td></tr>
-          <tr><td>🛋️ Location meublée</td><td>${f(rM)}</td><td>${ch?f(ch):'—'}</td><td class="amt">${f(rM+ch)}</td></tr>
+          <tr><td>🛋️ Location meublée</td><td>${f(rM)}</td><td>${(rM&&ch)?f(ch):'—'}</td><td class="amt">${f(rM+(rM?ch:0))}</td></tr>
         </tbody>
       </table>
     </div>
