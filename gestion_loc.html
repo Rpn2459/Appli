@@ -248,7 +248,7 @@ tr:last-child td{border-bottom:none}
     <div class="grid">
       <div class="field"><label>Loyer nu HC (€)</label><input id="rN" value="630" type="number" inputmode="decimal" oninput="autoFee()"></div>
       <div class="field"><label>Loyer meublé HC (€)</label><input id="rM" value="660" type="number" inputmode="decimal" oninput="autoFee()"></div>
-      <div class="field"><label>Charges locatives (€)</label><input id="rC" value="0" type="number" inputmode="decimal"></div>
+      <div class="field"><label>Charges locatives nu (€)</label><input id="rC" value="0" type="number" inputmode="decimal"></div><div class="field"><label>Charges locatives meublé (€)</label><input id="rCM" value="0" type="number" inputmode="decimal"></div>
     </div>
   </div>
 
@@ -343,7 +343,7 @@ function calc(){
 }
 
 function getHTMLPage1(){
-  const c=calc(),rN=n('rN'),rM=n('rM'),ch=n('rC'),surf=n('ps'),fM=n('fM'),fE=n('fE');
+  const c=calc(),rN=n('rN'),rM=n('rM'),ch=n('rC'),chM=n('rCM'),surf=n('ps'),fM=n('fM'),fE=n('fE');
   return `
   <div class="page">
     <div class="dh">
@@ -359,7 +359,7 @@ function getHTMLPage1(){
         <thead><tr><th>Type de bail</th><th>Loyer HC</th><th>Charges</th><th>Loyer CC</th></tr></thead>
         <tbody>
           <tr><td>📄 Location nue</td><td>${f(rN)}</td><td>${ch?f(ch):'—'}</td><td class="amt">${f(rN+ch)}</td></tr>
-          <tr><td>🛋️ Location meublée</td><td>${f(rM)}</td><td>${(rM&&ch)?f(ch):'—'}</td><td class="amt">${f(rM+(rM?ch:0))}</td></tr>
+          <tr><td>🛋️ Location meublée</td><td>${f(rM)}</td><td>${(rM&&chM)?f(chM):'—'}</td><td class="amt">${f(rM+(rM?chM:0))}</td></tr>
         </tbody>
       </table>
     </div>
