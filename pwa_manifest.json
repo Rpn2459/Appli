@@ -2,7 +2,7 @@
     "name": "Proposition Gestion Locative",
     "short_name": "Propal_Immo_GHI_StO",
     "description": "Créez et envoyez des propositions de gestion locative en PDF",
-    "start_url": "./proposition_commerciale.html",
+    "start_url": "./index.html",
     "scope": "./",
     "display": "standalone",
     "background_color": "#1a2a4a",

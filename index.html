@@ -259,19 +259,19 @@ tr:last-child td{border-bottom:none}
 
   <div class="esec"><h3>💰 Loyers</h3>
     <div class="grid">
-      <div class="field"><label>Loyer nu HC (€)</label><input id="rN" value="630" type="number" inputmode="decimal"></div>
-      <div class="field"><label>Loyer meublé HC (€)</label><input id="rM" value="660" type="number" inputmode="decimal"></div>
+      <div class="field"><label>Loyer nu HC (€)</label><input id="rN" value="630" type="number" inputmode="decimal" oninput="autoFee()"></div>
+      <div class="field"><label>Loyer meublé HC (€)</label><input id="rM" value="660" type="number" inputmode="decimal" oninput="autoFee()"></div>
       <div class="field"><label>Charges sur location nue (€)</label><input id="rCN" value="0" type="number" inputmode="decimal"></div><div class="field"><label>Charges sur location meublée (€)</label><input id="rCM" value="0" type="number" inputmode="decimal"></div>
     </div>
   </div>
 
   <div class="esec"><h3>📋 Honoraires de location</h3>
     <div class="grid">
-      <div class="field"><label>Mission complète (€/m²)</label><input id="fM" value="8" type="number" inputmode="decimal" oninput="autoFee()"></div>
+      <div class="field"><label>Mission complète (€/m²)</label><input id="fM" value="8.07" type="number" inputmode="decimal" step="0.01" oninput="autoFee()"></div>
       <div class="field"><label>État des lieux (€/m²)</label><input id="fE" value="3" type="number" inputmode="decimal" oninput="autoFee()"></div>
       <div class="field"><label>Total honoraires (€)</label><input id="fT" value="510" type="number" inputmode="decimal"></div>
     </div>
-    <p class="note">Recalculé auto : (mission + EDL) × superficie</p>
+    <p class="note">Recalculé auto : mission (plafonnée à 1 loyer HC) + état des lieux × superficie</p>
   </div>
 
   <div class="esec"><h3>⚙️ Gestion & Assurances</h3>
@@ -291,8 +291,9 @@ tr:last-child td{border-bottom:none}
   <div class="esec"><h3>🎁 Offre promo</h3>
     <div class="grid">
       <div class="field"><label>Libellé</label><input id="pL" value="3 mois de gestion offerts"></div>
-      <div class="field"><label>Période</label><input id="pP" value="Du 1er juin au 30 juillet 2026"></div>
+      <div class="field"><label>Période</label><input id="pP" value="" placeholder="Du 1er novembre au 31 décembre 2026" oninput="checkPromo()"></div>
     </div>
+    <p class="note" id="promoNote">Laissez la période vide pour ne pas afficher d'offre. Une offre dont la date de fin est passée n'apparaît pas sur le PDF.</p>
   </div>
 </div>
 
@@ -338,9 +339,15 @@ function toast(msg,ms=2800){
   if(el){el.textContent=msg;el.classList.add('show');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('show'),ms);}
 }
 
+/* Barème : mission complète = 1 loyer HC, plafonné à fM €/m² ; état des lieux = fE €/m² en plus */
+function feeParts(){
+  const s=n('ps'),m=n('fM'),e=n('fE'),loyer=n('rN')||n('rM');
+  let mission=s*m; if(loyer>0&&mission>loyer) mission=loyer;
+  return {mission, edl:s*e, plafonne: loyer>0 && s*m>loyer};
+}
 function autoFee(){
   const s=n('ps'),m=n('fM'),e=n('fE');
-  if(s&&m&&e) document.getElementById('fT').value=(s*(m+e)).toFixed(2);
+  if(s&&m&&e){const p=feeParts();document.getElementById('fT').value=(p.mission+p.edl).toFixed(2);}
 }
 
 function calc(){
@@ -390,7 +397,7 @@ function getHTMLPage1(){
       </table>
       <table style="width:100%">
         <thead><tr><th>Surface habitable</th><th>Calcul Mission (${fM}€/m²)</th><th>Calcul EDL (${fE}€/m²)</th><th>Total Unique Facturé</th></tr></thead>
-        <tbody><tr class="hlr"><td>${surf} m²</td><td class="amt">${f(surf*fM)}</td><td class="amt">${f(surf*fE)}</td><td class="amt">${f(n('fT'))}</td></tr></tbody>
+        <tbody><tr class="hlr"><td>${surf} m²</td><td class="amt">${f(feeParts().mission)}${feeParts().plafonne?'<br><span style="font-size:8px;color:#555">(1 loyer HC)</span>':''}</td><td class="amt">${f(feeParts().edl)}</td><td class="amt">${f(n('fT'))}</td></tr></tbody>
       </table>
     </div>
 
@@ -409,10 +416,10 @@ function getHTMLPage1(){
       </table>
     </div>
 
-    <div class="promo">
+    ${promoActive() ? `<div class="promo">
       <div class="promo-ico">🎁</div>
       <div><div class="ps">${v('pP')}</div><div class="pm">${v('pL')}</div></div>
-    </div>
+    </div>` : ''}
     
     <div class="spacer"></div>
     <div class="df">${v('a1')} ${v('a2')} ${v('ac')} — agence juridiquement et financièrement indépendante. SAS au capital de ${v('ap')} € — RCS n° ${v('ar')} — ${v('aa')}.</div>
@@ -493,8 +500,19 @@ function getHTMLPage2(){
   </div>`;
 }
 
+/* Masque les lignes d'un type de bail sans loyer (ex. proposition en location nue uniquement) */
+function filtreBaux(html){
+  const sans = (motif) => { html = html.replace(/<tr>(?:(?!<\/tr>)[\s\S])*?<\/tr>/g, tr => motif.test(tr.replace(/<[^>]+>/g,' ')) ? '' : tr).replace(/rowspan="2"/g,'rowspan="1"'); };
+  if (!n('rM') && n('rN')) sans(/meubl/i);
+  if (!n('rN') && n('rM')) {
+    // la cellule « Bien » (rowspan) est sur la ligne nue : on la recopie sur la ligne meublée
+    html = html.replace(/<tr><td rowspan="2"([^>]*)>([\s\S]*?)<\/td>([\s\S]*?)<\/tr>(\s*)<tr>/, (m,attr,bien,rest,sp)=>`<tr><td rowspan="2"${attr}>${bien}</td>${rest}</tr>${sp}<tr><td${attr}>${bien}</td>`);
+    sans(/(^|\s)(location |gestion location )?nue?(\s|$)/i);
+  }
+  return html;
+}
 function getHTMLContent(){
-  return getHTMLPage1() + getHTMLPage2();
+  return filtreBaux(getHTMLPage1()) + filtreBaux(getHTMLPage2());
 }
 
 function render(){
@@ -601,13 +619,13 @@ async function generatePDFObject() {
   const { jsPDF } = window.jspdf;
   const pdf = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4', compress: true });
   
-  const canvas1 = await generatePDFPageObject(getHTMLPage1());
+  const canvas1 = await generatePDFPageObject(filtreBaux(getHTMLPage1()));
   const imgData1 = canvas1.toDataURL('image/jpeg', 0.94);
   pdf.addImage(imgData1, 'JPEG', 0, 0, 210, 297, undefined, 'FAST');
   
   pdf.addPage('a4', 'p');
   
-  const canvas2 = await generatePDFPageObject(getHTMLPage2());
+  const canvas2 = await generatePDFPageObject(filtreBaux(getHTMLPage2()));
   const imgData2 = canvas2.toDataURL('image/jpeg', 0.94);
   pdf.addImage(imgData2, 'JPEG', 0, 0, 210, 297, undefined, 'FAST');
   
@@ -656,6 +674,42 @@ async function shareDocument() {
   }
 }
 
+
+/* ===== Offre promo : affichée seulement si une période est saisie et non expirée ===== */
+const MOIS={janvier:0,'février':1,fevrier:1,mars:2,avril:3,mai:4,juin:5,juillet:6,'août':7,aout:7,septembre:8,octobre:9,novembre:10,'décembre':11,decembre:11};
+function promoFin(){
+  // dernière date du texte, ex. « Du 1er avril au 30 juin 2026 » → 30/06/2026 ; accepte aussi 30/06/2026
+  const t=v('pP').toLowerCase();
+  let m=[...t.matchAll(/(\d{1,2})(?:er)?\s+([a-zéû]+)\s+(\d{4})/g)].pop();
+  if(m&&MOIS[m[2]]!==undefined) return new Date(+m[3],MOIS[m[2]],+m[1],23,59,59);
+  m=[...t.matchAll(/(\d{1,2})\/(\d{1,2})\/(\d{4})/g)].pop();
+  if(m) return new Date(+m[3],+m[2]-1,+m[1],23,59,59);
+  return null;
+}
+function promoActive(){
+  if(!v('pP').trim()||!v('pL').trim()) return false;
+  const fin=promoFin();
+  return !fin || fin>=new Date();
+}
+function checkPromo(){
+  const el=document.getElementById('promoNote'); if(!el) return;
+  const fin=promoFin();
+  if(v('pP').trim()&&fin&&fin<new Date()){el.textContent='⚠️ Cette offre est expirée : elle ne sera pas affichée sur le PDF.';el.style.color='#c0392b';}
+  else{el.textContent="Laissez la période vide pour ne pas afficher d'offre. Une offre dont la date de fin est passée n'apparaît pas sur le PDF.";el.style.color='';}
+}
+
+/* ===== Pré-remplissage par lien (utilisé par Émi / agent Commercial) =====
+   Exemple : index.html?pa=5 rue de l'Égalité 62510 Arques&pt=Appartement T2&ps=47&rN=630&rM=660&cPre=Kévin&cNom=Baillet&vue=apercu
+   Chaque paramètre porte le nom (id) du champ du formulaire. vue=apercu ouvre directement l'aperçu. */
+function applyUrlParams(){
+  const q=new URLSearchParams(location.search); let n=0;
+  q.forEach((val,key)=>{
+    const el=document.getElementById(key);
+    if(el&&(el.tagName==='INPUT'||el.tagName==='SELECT'||el.tagName==='TEXTAREA')){el.value=val;n++;}
+  });
+  return {n, feeGiven:q.has('fT'), apercu:(q.get('vue')||'').toLowerCase()==='apercu'};
+}
+
 /* TABS AVEC MISE À L'ÉCHELLE MOBILE VISUELLE */
 function go(t){
   document.querySelectorAll('.tab').forEach((x,i)=>
@@ -692,8 +746,11 @@ function go(t){
 }
 
 loadRep();
-autoFee();
+const urlInit=applyUrlParams();
+if(!urlInit.feeGiven) autoFee();
+checkPromo();
 render();
+if(urlInit.n){ toast('📋 Proposition pré-remplie ('+urlInit.n+' champs) — vérifiez avant d\'envoyer'); if(urlInit.apercu) go('preview'); }
 </script>
 </body>
 </html>
