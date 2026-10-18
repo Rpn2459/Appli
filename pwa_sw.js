@@ -1,7 +1,7 @@
-const CACHE = 'prop-immo-v2';
+const CACHE = 'prop-immo-v3';
 const ASSETS = [
   './',
-  './proposition_commerciale.html',
+'./index.html',
   './pwa_manifest.json',
   './icon-192.png',
   './icon-512.png',
