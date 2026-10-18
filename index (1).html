@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#1a2a4a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="PropImmo">
+<meta name="description" content="Créez et envoyez des propositions de gestion locative en PDF">
+<title>PropImmo — Proposition Locative</title>
+
+<link rel="manifest" href="pwa_manifest.json">
+
+<link rel="apple-touch-icon" href="icon-192.png">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./pwa_sw.js')
+        .then(() => console.log('✅ Service Worker enregistré'))
+        .catch(e => console.warn('SW erreur:', e));
+    });
+  }
+</script>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow-x:hidden}
+body{font-family:Arial,sans-serif;background:#f0f4f8;font-size:14px;
+  overscroll-behavior:none;
+  padding-top:env(safe-area-inset-top);
+  padding-bottom:env(safe-area-inset-bottom);
+}
+
+/* ── TABS ── */
+.tabs{display:flex;background:#1a2a4a;position:sticky;top:0;z-index:100;
+  padding-top:env(safe-area-inset-top)}
+.tab{flex:1;padding:14px 8px;color:#aac;cursor:pointer;font-size:13px;
+  text-align:center;border-bottom:3px solid transparent;transition:.2s;
+  -webkit-tap-highlight-color:transparent}
+.tab.active{color:#fff;border-bottom-color:#2196F3;font-weight:bold}
+.tab-content{display:none}.tab-content.active{display:block}
+
+/* ── EDITOR ── */
+.editor{padding:16px;max-width:700px;margin:0 auto;
+  padding-bottom:calc(80px + env(safe-area-inset-bottom))}
+.editor h2{color:#1a2a4a;margin-bottom:14px;font-size:16px}
+.esec{background:#fff;border-radius:8px;padding:14px;margin-bottom:12px;
+  box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.esec h3{color:#2196F3;font-size:11px;text-transform:uppercase;letter-spacing:1px;
+  margin-bottom:12px;border-bottom:2px solid #e8f4fd;padding-bottom:6px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid.one{grid-template-columns:1fr}
+.field{display:flex;flex-direction:column;gap:4px}
+.field label{font-size:11px;color:#666;font-weight:bold}
+.field input,.field textarea{border:1px solid #ddd;border-radius:6px;
+  padding:10px 12px;font-size:14px;color:#333;width:100%;
+  font-family:Arial,sans-serif;
+  -webkit-appearance:none;appearance:none;
+  background:#fff}
+.field input:focus,.field textarea:focus{outline:none;border-color:#2196F3;
+  box-shadow:0 0 0 3px rgba(33,150,243,.15)}
+
+.field input[readonly] {
+  background: #f1f5f9 !important;
+  color: #64748b !important;
+  border-color: #e2e8f0 !important;
+  cursor: not-allowed !important;
+}
+.note{font-size:11px;color:#888;font-style:italic;margin-top:5px}
+
+/* ── BOUTONS FIXES EN BAS ── */
+.acts-fixed{position:fixed;bottom:0;left:0;right:0;
+  background:#fff;border-top:1px solid #e0e0e0;
+  padding:10px 16px calc(10px + env(safe-area-inset-bottom));
+  display:flex;gap:8px;z-index:99;box-shadow:0 -2px 12px rgba(0,0,0,.1)}
+.btn{flex:1;border:none;padding:13px 8px;border-radius:8px;cursor:pointer;
+  font-size:13px;font-weight:bold;text-align:center;transition:.15s;
+  -webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.btn:active{transform:scale(.97);opacity:.9}
+.btn.blue{background:#2196F3;color:#fff}
+.btn.green{background:#27ae60;color:#fff}
+.btn.share{background:#2980b9;color:#fff}
+.btn.gray{background:#607d8b;color:#fff}
+
+/* ── PREVIEW RESPONSIVE ── */
+.preview-wrap{background:#cdd4db;padding:12px;
+  padding-bottom:calc(80px + env(safe-area-inset-bottom));
+  display:flex;flex-direction:column;align-items:center}
+.preview-acts{width:100%;max-width:794px;display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.doc-scroll{width:100%;overflow:visible;display:flex;justify-content:center;align-items:flex-start}
+
+.scale-container{transform-origin:top center;transition:transform 0.1s ease}
+
+/* ── TOAST NOTIFICATION ── */
+.toast{position:fixed;bottom:calc(80px + env(safe-area-inset-bottom) + 12px);
+  left:50%;transform:translateX(-50%) translateY(20px);
+  background:#323232;color:#fff;padding:10px 20px;border-radius:24px;
+  font-size:13px;opacity:0;transition:.3s;z-index:200;white-space:nowrap;
+  pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* =========================================
+   DOCUMENT A4 STRUCTURÉ SUR 2 PAGES ENTIÈRES (794×1123px)
+   ========================================= */
+.doc{background:#fff;width:794px;margin:0 auto;
+  box-shadow:0 2px 20px rgba(0,0,0,.18);
+  font-family:Arial,sans-serif;font-size:10.5px;line-height:1.45;color:#222}
+.page{width:794px;height:1123px;max-height:1123px;overflow:hidden;display:flex;
+  flex-direction:column;position:relative;background:#fff;box-sizing:border-box;}
+.pb{page-break-after:always;break-after:page}
+
+.dh{background:#1a2a4a;color:#fff;padding:20px 24px;display:flex;
+  justify-content:space-between;align-items:center;gap:10px;flex-shrink:0}
+.dh h1{font-size:18px;line-height:1.3;font-weight:900;text-transform:uppercase;flex:1}
+.dh h1 .c{color:#2196F3}
+.dh-logo{text-align:right;flex-shrink:0}
+.dh-logo .lt{font-size:20px;font-weight:900;line-height:1}
+.dh-logo .lb{font-size:20px;font-weight:900;color:#2196F3;line-height:1}
+.dh-logo .lc{font-size:9px;color:#aac;margin-top:3px}
+
+.abar{background:#eef5ff;border:1.5px solid #c5dff8;text-align:center;
+  padding:8px 18px;color:#1a2a4a;font-weight:bold;font-size:11px;
+  margin:0 24px 14px;border-radius:0 0 5px 5px;flex-shrink:0}
+
+.st{display:flex;align-items:center;gap:7px;background:#2196F3;color:#fff;
+  font-size:10.5px;font-weight:bold;padding:6px 12px;border-radius:4px;
+  margin-bottom:10px;text-transform:uppercase;letter-spacing:.6px;flex-shrink:0}
+
+.st.orange{background:#e67e22}
+
+.ds{margin:0 24px 14px;flex-shrink:0}
+
+.c-footer-signature {
+  margin: 0 24px 14px;
+  padding: 12px 16px;
+  background: #f8fafc;
+  border-top: 2px solid #2196F3;
+  border-radius: 4px;
+  font-size: 11px;
+  color: #334155;
+  text-align: right;
+  flex-shrink: 0;
+}
+.c-footer-signature strong {
+  color: #1a2a4a;
+  font-size: 11.5px;
+}
+
+table{width:100%;border-collapse:collapse;font-size:10px}
+th{background:#1a2a4a;color:#fff;padding:6px 8px;text-align:left;
+  font-size:9.5px;text-transform:uppercase;letter-spacing:.4px;font-weight:bold}
+td{padding:6px 8px;border-bottom:1px solid #eee;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+.zb tr:nth-child(even) td{background:#f5f9ff}
+.amt{color:#2196F3;font-weight:bold}
+.hlr td{background:#1a2a4a;color:#fff;font-weight:bold}
+.hlr .amt{color:#7ecfff}
+.offered{color:#27ae60;font-weight:bold;font-size:9.5px}
+
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:0 24px 14px;flex-shrink:0}
+.two>.col{min-width:0}
+
+.ib{background:#f0f6ff;border-left:3px solid #2196F3;padding:6px 10px;
+  border-radius:0 4px 4px 0;margin-bottom:6px;font-size:10px;color:#333;line-height:1.5}
+
+.promo{background:linear-gradient(130deg,#1a2a4a 55%,#1e3560);color:#fff;
+  padding:12px 20px;margin:0 24px 14px;border-radius:6px;
+  display:flex;align-items:center;gap:14px;flex-shrink:0}
+.promo-ico{font-size:26px;flex-shrink:0}
+.promo .pm{font-size:13.5px;font-weight:bold}
+.promo .ps{font-size:9.5px;color:#aac}
+
+.gg{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px}
+.gc{background:#eef5ff;border:1.5px solid #c5dff8;border-radius:4px;padding:8px 4px;text-align:center}
+.gc .gi{font-size:16px;margin-bottom:2px}
+.gc .gl{font-size:8.5px;color:#666;text-transform:uppercase;letter-spacing:.3px}
+.gc .ga{font-size:12.5px;font-weight:bold;color:#1a2a4a;margin:2px 0}
+.gc .gs{font-size:8px;color:#888}
+
+.svc2{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+.svcs{list-style:none}
+.svcs li{padding:4px 0;border-bottom:1px solid #f0f4ff;font-size:9.5px;
+  color:#333;display:flex;gap:5px;line-height:1.35}
+.svcs li .ico{width:14px;text-align:center;flex-shrink:0;font-size:10px}
+
+.p2h{background:#1a2a4a;color:#fff;padding:10px 24px;
+  display:flex;justify-content:space-between;align-items:center;
+  font-size:10.5px;flex-shrink:0;margin-bottom:14px}
+.p2h strong{color:#2196F3}
+
+.chip{display:inline-block;background:#e8f4fd;color:#1565c0;font-size:8.5px;
+  font-weight:bold;padding:1px 5px;border-radius:5px;border:1px solid #b3d9f7}
+
+.df{background:#1a2a4a;color:#7a8faa;font-size:8px;text-align:center;
+  padding:8px 16px;line-height:1.5;margin-top:auto;flex-shrink:0}
+.spacer{flex:1 1 auto}
+
+/* PRINT */
+@media print{
+  .tabs,.editor,.preview-acts,.acts-fixed,.toast{display:none!important}
+  body{background:#fff;padding:0}
+  .preview-wrap{padding:0;background:#fff}
+  .tab-content{display:block!important}
+  .doc-scroll{overflow:visible;background:#fff}
+  .doc{overflow:visible;box-shadow:none;width:210mm;margin:0 auto}
+  .page{width:210mm;height:297mm;max-height:297mm;overflow:hidden;margin:0}
+  .pb{page-break-after:always;break-after:page}
+  @page{size:A4 portrait;margin:0}
+}
+</style>
+</head>
+<body>
+
+<div class="tabs">
+  <div class="tab active" onclick="go('editor')">📝 Personnaliser</div>
+  <div class="tab" onclick="go('preview')">👁️ Aperçu</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div id="editor" class="tab-content active">
+<div class="editor">
+  <h2>📝 Personnalisation</h2>
+
+  <div class="esec"><h3>🏢 Agence (Verrouillé)</h3>
+    <div class="grid">
+      <div class="field"><label>Nom (ligne 1)</label><input id="a1" value="GUY" readonly></div>
+      <div class="field"><label>Nom (ligne 2)</label><input id="a2" value="HOQUET" readonly></div>
+      <div class="field"><label>Ville</label><input id="ac" value="SAINT-OMER" readonly></div>
+      <div class="field"><label>Adresse agence</label><input id="aa" value="8 rue de l'Ecusserie 62500 Saint-Omer" readonly></div>
+      <div class="field"><label>N° RCS</label><input id="ar" value="905000402" readonly></div>
+      <div class="field"><label>Capital (€)</label><input id="ap" value="12 000" readonly></div>
+    </div>
+  </div>
+
+  <div class="esec"><h3>👤 Votre profil Conseiller (Sauvegarde automatique)</h3>
+    <div class="grid">
+      <div class="field"><label>Nom</label><input id="cNom" value="" placeholder="Ex: Planchon" oninput="saveRep()"></div>
+      <div class="field"><label>Prénom</label><input id="cPre" value="" placeholder="Ex: Rémi" oninput="saveRep()"></div>
+      <div class="field"><label>Numéro de tel</label><input id="cT" value="" type="tel" placeholder="Ex: 06 00 00 00 00" oninput="saveRep()"></div>
+      <div class="field"><label>Adresse mail</label><input id="cE" value="" type="email" placeholder="Ex: r.planchon@guyhoquet.com" oninput="saveRep()"></div>
+    </div>
+  </div>
+
+  <div class="esec"><h3>🏡 Bien</h3>
+    <div class="grid one"><div class="field"><label>Adresse complète</label><input id="pa" value="Appartement D2, 5 rue de l'Egalité 62510 ARQUES"></div></div>
+    <div class="grid" style="margin-top:10px">
+      <div class="field"><label>Type de bien</label><input id="pt" value="Appartement 1 chambre"></div>
+      <div class="field"><label>Superficie (m²)</label><input id="ps" value="47" type="number" inputmode="numeric" oninput="autoFee()"></div>
+      <div class="field"><label>Référence / Lot</label><input id="pr" value="D2"></div>
+    </div>
+  </div>
+
+  <div class="esec"><h3>💰 Loyers</h3>
+    <div class="grid">
+      <div class="field"><label>Loyer nu HC (€)</label><input id="rN" value="630" type="number" inputmode="decimal" oninput="autoFee()"></div>
+      <div class="field"><label>Loyer meublé HC (€)</label><input id="rM" value="660" type="number" inputmode="decimal" oninput="autoFee()"></div>
+      <div class="field"><label>Charges sur location nue (€)</label><input id="rCN" value="0" type="number" inputmode="decimal"></div><div class="field"><label>Charges sur location meublée (€)</label><input id="rCM" value="0" type="number" inputmode="decimal"></div>
+    </div>
+  </div>
+
+  <div class="esec"><h3>📋 Honoraires de location</h3>
+    <div class="grid">
+      <div class="field"><label>Mission complète (€/m²)</label><input id="fM" value="8.07" type="number" inputmode="decimal" step="0.01" oninput="autoFee()"></div>
+      <div class="field"><label>État des lieux (€/m²)</label><input id="fE" value="3" type="number" inputmode="decimal" oninput="autoFee()"></div>
+      <div class="field"><label>Total honoraires (€)</label><input id="fT" value="510" type="number" inputmode="decimal"></div>
+    </div>
+    <p class="note">Recalculé auto : (mission + EDL) × superficie, total plafonné à 1 mois de loyer HC</p>
+  </div>
+
+  <div class="esec"><h3>⚙️ Gestion & Assurances</h3>
+    <div class="grid">
+      <div class="field"><label>Taux gestion (%)</label><input id="gR" value="6" type="number" inputmode="decimal"></div>
+      <div class="field"><label>Taux multi-lots (%)</label><input id="gM" value="5" type="number" inputmode="decimal"></div>
+      <div class="field"><label>Seuil multi-lots (lots)</label><input id="gT" value="10" type="number" inputmode="numeric"></div>
+      <div class="field"><label>Taux GLI (%)</label><input id="gi" value="2.75" type="number" inputmode="decimal" step="0.01"></div>
+      <div class="field"><label>Plafond loyers impayés (€)</label><input id="glL" value="90 000"></div>
+      <div class="field"><label>Plafond détériorations (€)</label><input id="glD" value="10 000"></div>
+      <div class="field"><label>Plafond protection juridique (€)</label><input id="glJ" value="6 000"></div>
+      <div class="field"><label>Seuil intervention (€)</label><input id="glS" value="250"></div>
+      <div class="field"><label>PNO standard (€/an)</label><input id="pno" value="120" type="number" inputmode="decimal"></div>
+    </div>
+  </div>
+
+  <div class="esec"><h3>🎁 Offre promo</h3>
+    <div class="grid">
+      <div class="field"><label>Libellé</label><input id="pL" value="3 mois de gestion offerts"></div>
+      <div class="field"><label>Période</label><input id="pP" value="" placeholder="Du 1er novembre au 31 décembre 2026" oninput="checkPromo()"></div>
+    </div>
+    <p class="note" id="promoNote">Laissez la période vide pour ne pas afficher d'offre. Une offre dont la date de fin est passée n'apparaît pas sur le PDF.</p>
+  </div>
+</div>
+
+<div class="acts-fixed">
+  <button class="btn blue" onclick="render();go('preview')">👁️ Aperçu</button>
+  <button class="btn green" onclick="render();go('preview');setTimeout(doPDF,400)">💾 PDF</button>
+  <button class="btn share" onclick="render();go('preview');setTimeout(shareDocument,400)">📤 Partager</button>
+</div>
+</div>
+
+<div id="preview" class="tab-content">
+  <div class="preview-wrap">
+    <div class="preview-acts">
+      <button class="btn blue" style="flex:none;padding:11px 14px" onclick="go('editor')">📝 Modifier</button>
+      <button class="btn green" style="flex:none;padding:11px 14px" onclick="doPDF()">💾 PDF</button>
+      <button class="btn share" style="flex:none;padding:11px 14px" onclick="shareDocument()">📤 Partager</button>
+      <button class="btn gray" style="flex:none;padding:11px 14px" onclick="window.print()">🖨️</button>
+    </div>
+    <div class="doc-scroll"><div class="doc" id="docOut"></div></div>
+  </div>
+</div>
+
+<script>
+const v=id=>document.getElementById(id)?.value||'';
+const n=id=>parseFloat(v(id))||0;
+const f=x=>parseFloat(x).toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})+'\u00a0€';
+
+function loadRep(){
+  if(localStorage.getItem('propimmo_cNom')) document.getElementById('cNom').value = localStorage.getItem('propimmo_cNom');
+  if(localStorage.getItem('propimmo_cPre')) document.getElementById('cPre').value = localStorage.getItem('propimmo_cPre');
+  if(localStorage.getItem('propimmo_cT')) document.getElementById('cT').value = localStorage.getItem('propimmo_cT');
+  if(localStorage.getItem('propimmo_cE')) document.getElementById('cE').value = localStorage.getItem('propimmo_cE');
+}
+function saveRep(){
+  localStorage.setItem('propimmo_cNom', document.getElementById('cNom').value);
+  localStorage.setItem('propimmo_cPre', document.getElementById('cPre').value);
+  localStorage.setItem('propimmo_cT', document.getElementById('cT').value);
+  localStorage.setItem('propimmo_cE', document.getElementById('cE').value);
+}
+
+function toast(msg,ms=2800){
+  const el=document.getElementById('toast');
+  if(el){el.textContent=msg;el.classList.add('show');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('show'),ms);}
+}
+
+/* Barème : (mission fM €/m² + état des lieux fE €/m²) × surface, total plafonné à 1 mois de loyer HC */
+function feeParts(){
+  const s=n('ps'),m=n('fM'),e=n('fE'),loyer=n('rN')||n('rM');
+  const mission=s*m, edl=s*e, brut=mission+edl;
+  const plafonne = loyer>0 && brut>loyer;
+  return {mission, edl, total: plafonne ? loyer : brut, plafonne};
+}
+function autoFee(){
+  const s=n('ps'),m=n('fM'),e=n('fE');
+  if(s&&m&&e){document.getElementById('fT').value=feeParts().total.toFixed(2);}
+}
+
+/* Assiette gestion et GLI : loyer + charges (montants encaissés) */
+function baseCC(){
+  const rN=n('rN'),rM=n('rM');
+  return { N: rN ? rN+n('rCN') : 0, M: rM ? rM+n('rCM') : 0 };
+}
+function calc(){
+  const b=baseCC(),rN=b.N,rM=b.M,gr=n('gR')/100,gi=n('gi')/100;
+  return{
+    mN:f(rN*gr),mM:f(rM*gr),
+    gN:f(rN*gi),gM:f(rM*gi),
+    nN:f(rN*(1-gr)),nM:f(rM*(1-gr)),
+    ngN:f(rN*(1-gr-gi)),ngM:f(rM*(1-gr-gi))
+  };
+}
+
+function getHTMLPage1(){
+  const c=calc(),rN=n('rN'),rM=n('rM'),chN=n('rCN'),chM=n('rCM'),surf=n('ps'),fM=n('fM'),fE=n('fE');
+  return `
+  <div class="page">
+    <div class="dh">
+      <h1><span class="c">PROPRIÉTAIRES</span> ON S'OCCUPE<br>DE LA <span class="c">GESTION</span> DE VOTRE BIEN !</h1>
+      <div class="dh-logo"><div class="lt">${v('a1')}</div><div class="lb">${v('a2')}</div><div class="lc">${v('ac')}</div></div>
+    </div>
+    <div class="abar">📍 ${v('pa')}</div>
+    
+    <div class="ds">
+      <div class="st"><span>💰</span> Valeur Locative</div>
+      <p style="font-size:10px;color:#555;margin-bottom:7px">Estimation — <strong>${v('pt')}</strong> · ${surf} m²</p>
+      <table class="zb">
+        <thead><tr><th>Type de bail</th><th>Loyer HC</th><th>Charges</th><th>Loyer CC</th></tr></thead>
+        <tbody>
+          <tr><td>📄 Location nue</td><td>${f(rN)}</td><td>${chN?f(chN):'—'}</td><td class="amt">${f(rN+chN)}</td></tr>
+          <tr><td>🛋️ Location meublée</td><td>${f(rM)}</td><td>${chM?f(chM):'—'}</td><td class="amt">${f(rM+chM)}</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="ds">
+      <div class="st"><span>📋</span> Honoraires Location & Mise en place</div>
+      <table class="zb" style="margin-bottom:8px">
+        <thead><tr><th>Prestation de recherche & constitution du dossier</th><th style="text-align:center">Locataire</th><th style="text-align:center">Bailleur</th></tr></thead>
+        <tbody>
+          <tr><td>📢 Commercialisation complète, publicité & communication</td><td></td><td style="text-align:center">✅</td></tr>
+          <tr><td>🔍 Sélection rigoureuse & étude de solvabilité des dossiers</td><td></td><td style="text-align:center">✅</td></tr>
+          <tr><td>🚪 Organisation des visites du bien</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td></tr>
+          <tr><td>✍️ Rédaction du bail sécurisé & constitution des annexes</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td></tr>
+          <tr><td>🏡 Réalisation de l'état des lieux d'entrée (EDL)</td><td style="text-align:center">✅</td><td style="text-align:center">✅</td></tr>
+          <tr><td>🤝 Frais d'entremise et de négociation commerciale</td><td></td><td class="offered" style="text-align:center">🎁 Offert</td></tr>
+        </tbody>
+      </table>
+      <table style="width:100%">
+        <thead><tr><th>Surface habitable</th><th>Calcul Mission (${fM}€/m²)</th><th>Calcul EDL (${fE}€/m²)</th><th>Total Unique Facturé</th></tr></thead>
+        <tbody><tr class="hlr"><td>${surf} m²</td><td class="amt">${f(feeParts().mission)}</td><td class="amt">${f(feeParts().edl)}</td><td class="amt">${f(n('fT'))}${feeParts().plafonne?'<br><span style="font-size:8px;color:#555">plafonné à 1 mois de loyer HC</span>':''}</td></tr></tbody>
+      </table>
+    </div>
+
+    <div class="ds">
+      <div class="st"><span>⚙️</span> Honoraires de Gestion Courante</div>
+      <div class="ib" style="margin-bottom:8px">⚙️ <strong>Formule Standard :</strong> Un taux fixe de <strong>${v('gR')}% TTC</strong> appliqué sur l'ensemble des montants encaissés.</div>
+      <div class="ib" style="margin-bottom:8px">📦 <strong>Avantage Multi-lots :</strong> Un taux réduit à <strong>${v('gM')}% TTC</strong> accessible dès un portefeuille de <strong>${v('gT')} lots</strong>.</div>
+      
+      <p style="font-size:9.5px;color:#555;margin:8px 0 5px;font-weight:bold">Simulations de vos revenus nets mensuels (hors options) :</p>
+      <table class="zb">
+        <thead><tr><th>Type de Bail préconisé</th><th>Loyer + charges</th><th>Honoraires de gestion mensuels</th><th>Revenu Net reversé</th></tr></thead>
+        <tbody>
+          <tr><td>📄 Gestion Location Nue</td><td>${f(baseCC().N)}</td><td>${c.mN}</td><td class="amt">${c.nN}</td></tr>
+          <tr><td>🛋️ Gestion Location Meublée</td><td>${f(baseCC().M)}</td><td>${c.mM}</td><td class="amt">${c.nM}</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    ${promoActive() ? `<div class="promo">
+      <div class="promo-ico">🎁</div>
+      <div><div class="ps">${v('pP')}</div><div class="pm">${v('pL')}</div></div>
+    </div>` : ''}
+    
+    <div class="spacer"></div>
+    <div class="df">${v('a1')} ${v('a2')} ${v('ac')} — agence juridiquement et financièrement indépendante. SAS au capital de ${v('ap')} € — RCS n° ${v('ar')} — ${v('aa')}.</div>
+  </div>`;
+}
+
+function getHTMLPage2(){
+  const c=calc(),rN=n('rN'),rM=n('rM');
+  const hasRep = v('cNom') || v('cPre') || v('cT') || v('cE');
+  const fullName = [v('cPre'), v('cNom')].filter(Boolean).join(' ');
+  
+  return `
+  <div class="page">
+  <div class="dh">
+      <h1><span class="c">PROPRIÉTAIRES</span> ON S'OCCUPE<br>DE LA <span class="c">GESTION</span> DE VOTRE BIEN !</h1>
+      <div class="dh-logo"><div class="lt">${v('a1')}</div><div class="lb">${v('a2')}</div><div class="lc">${v('ac')}</div></div>
+    </div>
+    <div class="p2h"><strong>${v('a1')} ${v('a2')} ${v('ac')}</strong><span>📍 ${v('pa')}</span></div>
+
+    <div class="ds" style="margin-top:6px">
+      <div class="st"><span>🛡️</span> Assurances & Protections</div>
+      <p style="font-size:10px;color:#555;margin-bottom:9px"><strong>Option GLI :</strong> <span class="chip">${v('gi')}% TTC</span> du loyer et des charges</p>
+      <div class="gg">
+        <div class="gc"><div class="gi">🏦</div><div class="gl">Loyers impayés</div><div class="ga">${v('glL')} €</div><div class="gs">Sans franchise</div></div>
+        <div class="gc"><div class="gi">🔧</div><div class="gl">Détériorations</div><div class="ga">${v('glD')} €</div><div class="gs">Sans franchise</div></div>
+        <div class="gc"><div class="gi">⚖️</div><div class="gl">Protection juridique</div><div class="ga">${v('glJ')} €</div><div class="gs">Seuil : ${v('glS')} €</div></div>
+      </div>
+      <table class="zb" style="margin-bottom:12px">
+        <thead><tr><th>Bien</th><th>Bail</th><th>Loyer + charges</th><th>Gestion</th><th>GLI</th><th>Net final sécurisé</th></tr></thead>
+        <tbody>
+          <tr><td rowspan="2" style="font-weight:bold">${v('pt')}</td><td>📄 Nue</td><td>${f(baseCC().N)}</td><td>${c.mN}</td><td>${c.gN}</td><td class="amt">${c.ngN}</td></tr>
+          <tr><td>🛋️ Meublée</td><td>${f(baseCC().M)}</td><td>${c.mM}</td><td>${c.gM}</td><td class="amt">${c.ngM}</td></tr>
+        </tbody>
+      </table>
+      <p style="font-size:10px;color:#555">🏡 <strong>Assurance PNO :</strong> à partir de <strong>${v('pno')} €/an TTC</strong></p>
+    </div>
+
+    <div class="ds">
+      <div class="st"><span>✅</span> Services de Gestion Inclus</div>
+      <div class="svc2">
+        <ul class="svcs">
+          <li><span class="ico">👤</span>Interlocuteur unique location & gestion</li>
+          <li><span class="ico">💻</span>Espace client : baux, EDL, comptabilité</li>
+          <li><span class="ico">📨</span>Quittances mensuelles aux locataires</li>
+          <li><span class="ico">💳</span>Loyers reversés le 20 de chaque mois</li>
+        </ul>
+        <ul class="svcs">
+          <li><span class="ico">⛺</span>Saisie CAF pour locataires APL</li>
+          <li><span class="ico">📋</span>Attestations assurances & chaudière / an</li>
+          <li><span class="ico">📈</span>Révision annuelle des loyers (IRL)</li>
+          <li><span class="ico">🔨</span>Travaux urgents &lt; 175 € gérés directement</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="ds">
+      <div class="st"><span>🛠️</span> Services de Gestion Optionnels</div>
+      <div class="svc2">
+        <ul class="svcs">
+          <li><span class="ico">📊</span>Aide complète à la déclaration fiscale (Formulaire 2044)</li>
+          <li><span class="ico">🏢</span>Gestion complète des charges de copropriété & syndic</li>
+        </ul>
+        <ul class="svcs">
+          <li><span class="ico">🚨</span>Recouvrement des créances avec suivi et action d'huissier</li>
+          <li><span class="ico">🔄</span>Régularisation annuelle approfondie des charges locatives</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="spacer"></div>
+
+    ${hasRep ? `
+    <div class="c-footer-signature">
+      Votre conseiller commercial dédié : <strong>${fullName || '—'}</strong> ${v('cT') ? ' · 📞 ' + v('cT') : ''} ${v('cE') ? ' · ✉️ ' + v('cE') : ''}
+    </div>` : ''}
+
+    <div class="df">${v('a1')} ${v('a2')} ${v('ac')} — agence juridiquement et financièrement indépendante. SAS au capital de ${v('ap')} € — RCS n° ${v('ar')} — ${v('aa')}.</div>
+  </div>`;
+}
+
+/* Masque les lignes d'un type de bail sans loyer (ex. proposition en location nue uniquement) */
+function filtreBaux(html){
+  const sans = (motif) => { html = html.replace(/<tr>(?:(?!<\/tr>)[\s\S])*?<\/tr>/g, tr => motif.test(tr.replace(/<[^>]+>/g,' ')) ? '' : tr).replace(/rowspan="2"/g,'rowspan="1"'); };
+  if (!n('rM') && n('rN')) sans(/meubl/i);
+  if (!n('rN') && n('rM')) {
+    // la cellule « Bien » (rowspan) est sur la ligne nue : on la recopie sur la ligne meublée
+    html = html.replace(/<tr><td rowspan="2"([^>]*)>([\s\S]*?)<\/td>([\s\S]*?)<\/tr>(\s*)<tr>/, (m,attr,bien,rest,sp)=>`<tr><td rowspan="2"${attr}>${bien}</td>${rest}</tr>${sp}<tr><td${attr}>${bien}</td>`);
+    sans(/(^|\s)(location |gestion location )?nue?(\s|$)/i);
+  }
+  return html;
+}
+function getHTMLContent(){
+  return filtreBaux(getHTMLPage1()) + filtreBaux(getHTMLPage2());
+}
+
+function render(){
+  const out = document.getElementById('docOut');
+  if(out) out.innerHTML = getHTMLContent();
+}
+
+/* GENERATION PAR UNIQUE PAGE SANS AUCUN COMPORTEMENT FLOTTANT */
+function pdfName(){return`Proposition_${v('pr')||'bien'}_${v('ac')}.pdf`.replace(/\s+/g,'_');}
+
+function generatePDFPageObject(htmlMarkup) {
+  return new Promise((resolve, reject) => {
+    const iframe = document.createElement('iframe');
+    iframe.style.position = 'fixed';
+    iframe.style.top = '-20000px';
+    iframe.style.left = '-20000px';
+    iframe.style.width = '794px';
+    iframe.style.height = '1123px';
+    iframe.style.border = 'none';
+    document.body.appendChild(iframe);
+
+    const styleLinks = Array.from(document.querySelectorAll('style')).map(s => s.outerHTML).join('\n');
+    const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+    
+    iframeDoc.open();
+    iframeDoc.write(`
+      <!DOCTYPE html>
+      <html style="width:794px !important; min-width:794px !important; height:1123px !important; max-height:1123px !important;">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=794, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+        ${styleLinks}
+        <style>
+          html, body { 
+            background: #ffffff !important; 
+            width: 794px !important; 
+            min-width: 794px !important; 
+            max-width: 794px !important; 
+            height: 1123px !important;
+            max-height: 1123px !important;
+            overflow: hidden !important; 
+            -webkit-text-size-adjust: none !important; 
+            text-size-adjust: none !important;
+          }
+          .page { 
+            box-shadow: none !important; 
+            margin: 0 !important; 
+            width: 794px !important; 
+            min-width: 794px !important; 
+            max-width: 794px !important; 
+            height: 1123px !important;
+            max-height: 1123px !important;
+            display: flex !important;
+            flex-direction: column !important;
+            overflow: hidden !important;
+          }
+          .svc2 {
+            display: table !important;
+            width: 100% !important;
+            table-layout: fixed !important;
+          }
+          .svc2 .svcs {
+            display: table-cell !important;
+            width: 50% !important;
+            vertical-align: top !important;
+          }
+        </style>
+      </head>
+      <body style="width:794px !important; height:1123px !important; max-height:1123px !important;">
+        <div id="iframeDocOut" style="width:794px !important; height:1123px !important; max-height:1123px !important;">${htmlMarkup}</div>
+      </body>
+      </html>
+    `);
+    iframeDoc.close();
+
+    setTimeout(async () => {
+      try {
+        const pageNode = iframeDoc.querySelector('.page');
+        const canvas = await window.html2canvas(pageNode, {
+          scale: 2,
+          useCORS: true,
+          logging: false,
+          backgroundColor: '#ffffff',
+          width: 794,
+          height: 1123,
+          windowWidth: 794,
+          windowHeight: 1123
+        });
+        document.body.removeChild(iframe);
+        resolve(canvas);
+      } catch (err) {
+        if(iframe.parentNode) document.body.removeChild(iframe);
+        reject(err);
+      }
+    }, 280);
+  });
+}
+
+async function generatePDFObject() {
+  if(document.activeElement && typeof document.activeElement.blur === 'function') {
+    document.activeElement.blur();
+  }
+  
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4', compress: true });
+  
+  const canvas1 = await generatePDFPageObject(filtreBaux(getHTMLPage1()));
+  const imgData1 = canvas1.toDataURL('image/jpeg', 0.94);
+  pdf.addImage(imgData1, 'JPEG', 0, 0, 210, 297, undefined, 'FAST');
+  
+  pdf.addPage('a4', 'p');
+  
+  const canvas2 = await generatePDFPageObject(filtreBaux(getHTMLPage2()));
+  const imgData2 = canvas2.toDataURL('image/jpeg', 0.94);
+  pdf.addImage(imgData2, 'JPEG', 0, 0, 210, 297, undefined, 'FAST');
+  
+  return pdf;
+}
+
+async function doPDF(){
+  toast('⏳ Génération du PDF…');
+  try {
+    const pdf = await generatePDFObject();
+    pdf.save(pdfName());
+    toast('✅ PDF 2 pages téléchargé !');
+  } catch(e) {
+    console.error(e);
+    toast('❌ Erreur lors de la création du PDF.');
+  }
+}
+
+/* LOGIQUE DE PARTAGE WEB SHARE NATIVE */
+async function shareDocument() {
+  toast('⏳ Préparation du partage…');
+  try {
+    const pdfObject = await generatePDFObject();
+    const pdfBlob = pdfObject.output('blob');
+    const fileName = pdfName();
+    
+    const file = new File([pdfBlob], fileName, { type: 'application/pdf' });
+    const shareText = `Bonjour, veuillez trouver ci-joint notre proposition commerciale de gestion locative concernant le bien situé à : ${v('pa')}.`;
+
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({
+        files: [file],
+        text: shareText,
+        title: 'Proposition Gestion Locative'
+      });
+      toast('✅ Document partagé !');
+    } else {
+      const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText + " (Le document PDF a été enregistré préliminairement dans vos téléchargements)")}`;
+      pdfObject.save(fileName);
+      window.open(waUrl, '_blank');
+      toast('💾 PDF enregistré & Partage ouvert !');
+    }
+  } catch (e) {
+    console.error(e);
+    toast('❌ Échec du partage.');
+  }
+}
+
+
+/* ===== Offre promo : affichée seulement si une période est saisie et non expirée ===== */
+const MOIS={janvier:0,'février':1,fevrier:1,mars:2,avril:3,mai:4,juin:5,juillet:6,'août':7,aout:7,septembre:8,octobre:9,novembre:10,'décembre':11,decembre:11};
+function promoFin(){
+  // dernière date du texte, ex. « Du 1er avril au 30 juin 2026 » → 30/06/2026 ; accepte aussi 30/06/2026
+  const t=v('pP').toLowerCase();
+  let m=[...t.matchAll(/(\d{1,2})(?:er)?\s+([a-zéû]+)\s+(\d{4})/g)].pop();
+  if(m&&MOIS[m[2]]!==undefined) return new Date(+m[3],MOIS[m[2]],+m[1],23,59,59);
+  m=[...t.matchAll(/(\d{1,2})\/(\d{1,2})\/(\d{4})/g)].pop();
+  if(m) return new Date(+m[3],+m[2]-1,+m[1],23,59,59);
+  return null;
+}
+function promoActive(){
+  if(!v('pP').trim()||!v('pL').trim()) return false;
+  const fin=promoFin();
+  return !fin || fin>=new Date();
+}
+function checkPromo(){
+  const el=document.getElementById('promoNote'); if(!el) return;
+  const fin=promoFin();
+  if(v('pP').trim()&&fin&&fin<new Date()){el.textContent='⚠️ Cette offre est expirée : elle ne sera pas affichée sur le PDF.';el.style.color='#c0392b';}
+  else{el.textContent="Laissez la période vide pour ne pas afficher d'offre. Une offre dont la date de fin est passée n'apparaît pas sur le PDF.";el.style.color='';}
+}
+
+/* ===== Pré-remplissage par lien (utilisé par Émi / agent Commercial) =====
+   Exemple : index.html?pa=5 rue de l'Égalité 62510 Arques&pt=Appartement T2&ps=47&rN=630&rM=660&cPre=Kévin&cNom=Baillet&vue=apercu
+   Chaque paramètre porte le nom (id) du champ du formulaire. vue=apercu ouvre directement l'aperçu. */
+function applyUrlParams(){
+  const q=new URLSearchParams(location.search); let n=0;
+  q.forEach((val,key)=>{
+    const el=document.getElementById(key);
+    if(el&&(el.tagName==='INPUT'||el.tagName==='SELECT'||el.tagName==='TEXTAREA')){el.value=val;n++;}
+  });
+  return {n, feeGiven:q.has('fT'), apercu:(q.get('vue')||'').toLowerCase()==='apercu'};
+}
+
+/* TABS AVEC MISE À L'ÉCHELLE MOBILE VISUELLE */
+function go(t){
+  document.querySelectorAll('.tab').forEach((x,i)=>
+    x.classList.toggle('active',(i===0&&t==='editor')||(i===1&&t==='preview')));
+  document.getElementById('editor').classList.toggle('active',t==='editor');
+  document.getElementById('preview').classList.toggle('active',t==='preview');
+  
+  if(t==='preview') {
+    render();
+    
+    const doc = document.getElementById('docOut');
+    const scrollWin = document.querySelector('.doc-scroll');
+    if(doc && scrollWin) {
+      if (doc.parentNode.classList.contains('scale-container')) {
+        const parent = doc.parentNode;
+        parent.parentNode.insertBefore(doc, parent);
+        parent.parentNode.removeChild(parent);
+      }
+      
+      const availableWidth = scrollWin.clientWidth;
+      if(availableWidth < 794) {
+        const scaleFactor = availableWidth / 794;
+        const wrapper = document.createElement('div');
+        wrapper.className = 'scale-container';
+        wrapper.style.width = '794px';
+        wrapper.style.height = (1123 * 2 * scaleFactor) + 'px'; 
+        wrapper.style.transform = `scale(${scaleFactor})`;
+        
+        doc.parentNode.insertBefore(wrapper, doc);
+        wrapper.appendChild(doc);
+      }
+    }
+  }
+}
+
+loadRep();
+const urlInit=applyUrlParams();
+if(!urlInit.feeGiven) autoFee();
+checkPromo();
+render();
+if(urlInit.n){ toast('📋 Proposition pré-remplie ('+urlInit.n+' champs) — vérifiez avant d\'envoyer'); if(urlInit.apercu) go('preview'); }
+</script>
+</body>
+</html>
